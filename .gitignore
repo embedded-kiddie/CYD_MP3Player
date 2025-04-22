@@ -1,32 +1,20 @@
-# Prerequisites
-*.d
+# ignore all files and directories
+/*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# allow list
+!*/.gitignore
+!README.md
+!LICENSE
 
-# Precompiled Headers
-*.gch
-*.pch
+!CYD_MP3Player_Basic
+!CYD_MP3Player_LVGL
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
 
-# Fortran module files
-*.mod
-*.smod
+# VSCODE
+*/.theia
+*/.vscode
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Mac special files
+*/.DS_store
+*/._*
 
-# Executables
-*.exe
-*.out
-*.app
