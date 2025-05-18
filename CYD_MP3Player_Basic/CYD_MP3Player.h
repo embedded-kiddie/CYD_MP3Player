@@ -1,8 +1,8 @@
 /*--------------------------------------------------------------------------------
  * CYD_MP3Player class definition
  *--------------------------------------------------------------------------------*/
-#ifndef _CYD_MP3PLAYER_
-#define _CYD_MP3PLAYER_
+#ifndef _CYD_MP3PLAYER_H_
+#define _CYD_MP3PLAYER_H_
 
 #include "CYD28_audio.h"
 
@@ -74,7 +74,7 @@ public:
   void        PlayPrev(void);
   void        AutoPlay(void);
 };
-
+/*
 void audio_info(const char *info);
 void audio_id3data(const char *info);
 void audio_eof_mp3(const char *info);
@@ -84,5 +84,5 @@ void audio_bitrate(const char *info);
 void audio_commercial(const char *info);
 void audio_icyurl(const char *info);
 void audio_lasthost(const char *info);
-
-#endif // _CYD_MP3PLAYER_
+*/
+#endif // _CYD_MP3PLAYER_H_
