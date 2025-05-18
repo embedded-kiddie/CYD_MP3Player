@@ -24,8 +24,8 @@
 typedef struct {
   std::string path;
   std::string title;
-  std::string album;
   std::string artist;
+  std::string album;
   uint32_t    duration;
 } PlayList_t;
 
