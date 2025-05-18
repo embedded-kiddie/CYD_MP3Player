@@ -35,7 +35,7 @@ typedef struct {
  *  "#define SDFATFS_USED" in CYD_Audio.h
  *  "#define USE_UTF8_LONG_NAMES 1" in SdFatConfig.h
  *--------------------------------------------------------------------------------*/
-#define SD_CLOCK  20000000  // 1MHz --> 20MHz and up
+#define SD_CLOCK  25000000 // The maximum SD SPI clock of ESP32-2432S028 would be 24 MHz
 #define SD_CS     SS
 
 #if defined (SDFATFS_USED)  // defined in CYD_Audio.h
