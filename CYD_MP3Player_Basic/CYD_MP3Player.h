@@ -56,22 +56,23 @@ private:
   bool CheckExtension(const char* path);
 
 public:
-  bool      begin(void);
-  uint32_t  GetPlayNo(void) { return m_playNo; }
-  uint32_t  GetCounts(void) { return m_files.size(); }
-  void      ScanFileList(const char *dirname, uint8_t levels);
-  void      SortFileList(bool shuffle = false);
+  bool        begin(void);
+  uint32_t    GetPlayNo(void) { return m_playNo; }
+  uint32_t    GetCounts(void) { return m_files.size(); }
+  const char* GetPath(uint32_t playNo) { return m_files[playNo].path.c_str(); }
+  void        ScanFileList(const char *dirname, uint8_t levels);
+  void        SortFileList(bool shuffle = false);
 
-  void      SetVolume(uint8_t vol);
-  uint8_t   GetVolumePerCent(void);
-  bool      IsPlaying(void);
-  bool      FilePlay(const char* path);
-  void      StopPlay(void);
-  void      PauseResume(void);
-  void      SetPlayNo(uint32_t playNo);
-  void      PlayNext(void);
-  void      PlayPrev(void);
-  void      AutoPlay(void);
+  void        SetVolume(uint8_t vol);
+  uint8_t     GetVolumePerCent(void);
+  bool        IsPlaying(void);
+  bool        FilePlay(const char* path);
+  void        StopPlay(void);
+  void        PauseResume(void);
+  void        SetPlayNo(uint32_t playNo);
+  void        PlayNext(void);
+  void        PlayPrev(void);
+  void        AutoPlay(void);
 };
 
 void audio_info(const char *info);
