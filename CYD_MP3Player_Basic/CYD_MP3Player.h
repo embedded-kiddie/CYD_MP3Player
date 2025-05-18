@@ -27,7 +27,7 @@ typedef struct {
   std::string album;
   std::string artist;
   uint32_t    duration;
-} FileInfo_t;
+} PlayList_t;
 
 /*--------------------------------------------------------------------------------
  * Definition of SPI file system for audio files
@@ -38,8 +38,8 @@ typedef struct {
 #define SD_CLOCK  20000000  // 1MHz --> 20MHz and up
 #define SD_CS     SS
 
-#if   defined (SDFATFS_USED)
-#define FS_DEV    SD_SDFAT
+#if defined (SDFATFS_USED)  // defined in CYD_Audio.h
+#define FS_DEV    SD_SDFAT  // defined in CYD_Audio.cpp
 #define FS_CONFIG SD_CS, SD_CLOCK
 #define BUF_SIZE  64
 #elif defined (_SD_H_)
@@ -49,22 +49,29 @@ typedef struct {
 
 class CYD_MP3Player {
 private:
-  int m_playNo = 0;
+  uint32_t m_playNo = 0;
   fs::FS & m_fs = FS_DEV;
-  std::vector<FileInfo_t> m_files = {};
+  std::vector<PlayList_t> m_files = {};
 
-  bool VerifyExt(const char* file);
+  bool CheckExtension(const char* path);
 
 public:
-  bool    begin(void);
-  void    ScanFileList(const char *dirname, uint8_t levels);
-  void    SortFileList(bool shuffle = false);
-  void    SetVolume(uint8_t vol);
-  uint8_t GetVolumePerCent(void);
-  bool    IsPlaying(void);
-  void    StopPlay(void);
-  bool    FilePlay(const char* path);
-  void    AutoPlay(void);
+  bool      begin(void);
+  uint32_t  GetPlayNo(void) { return m_playNo; }
+  uint32_t  GetCounts(void) { return m_files.size(); }
+  void      ScanFileList(const char *dirname, uint8_t levels);
+  void      SortFileList(bool shuffle = false);
+
+  void      SetVolume(uint8_t vol);
+  uint8_t   GetVolumePerCent(void);
+  bool      IsPlaying(void);
+  bool      FilePlay(const char* path);
+  void      StopPlay(void);
+  void      PauseResume(void);
+  void      SetPlayNo(uint32_t playNo);
+  void      PlayNext(void);
+  void      PlayPrev(void);
+  void      AutoPlay(void);
 };
 
 void audio_info(const char *info);

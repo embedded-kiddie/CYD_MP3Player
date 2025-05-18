@@ -1,6 +1,6 @@
 #include "CYD28_audio.h"
 
-CYD_Audio audio; 
+CYD_Audio audio;
 
 void audioTask(void *parameter);
 void CreateQueues();
@@ -49,7 +49,7 @@ void audioTask(void *parameter)
 	}
 	audioMessage_t audioRxTaskMessage;
 	audioMessage_t audioTxTaskMessage;
-	
+
 	audio.setVolume(21); // 0...21
 
 	while (true)
@@ -61,7 +61,7 @@ void audioTask(void *parameter)
 				case IS_PLAYING:
 					audioTxTaskMessage.cmd = IS_PLAYING;
 					audioTxTaskMessage.ret = audio.isRunning();
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);					
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
 				case SET_VOLUME:
 					audioTxTaskMessage.cmd = SET_VOLUME;
@@ -75,12 +75,12 @@ void audioTask(void *parameter)
 					vol = audio.getVolume();
 					steps = audio.maxVolume();
 					audioTxTaskMessage.ret = ((uint32_t)vol << 16) | steps;		// hi = vol setting, lo = max no of steps
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);				
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
 				case GET_RMS:
 					audioTxTaskMessage.cmd = GET_RMS;
 					audioTxTaskMessage.ret = audio.getRMS();
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);		
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
 				case CONNECTTOHOST:
 					audioTxTaskMessage.cmd = CONNECTTOHOST;
@@ -96,14 +96,20 @@ void audioTask(void *parameter)
 				case CONNECTTOSPEECH:
 					audioTxTaskMessage.cmd = CONNECTTOSPEECH;
 					audioTxTaskMessage.ret = audio.connecttospeech(audioRxTaskMessage.txt1, audioRxTaskMessage.txt2);
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);				
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
 				case AUDIO_STOP:
 					audioTxTaskMessage.cmd = AUDIO_STOP;
 					audio.stopSong();
 					audioTxTaskMessage.ret = 1;
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);				
-					break;			
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
+					break;
+				case PAUSE_RESUME:
+					audioTxTaskMessage.cmd = PAUSE_RESUME;
+					audio.pauseResume();
+					audioTxTaskMessage.ret = 1;
+					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
+					break;
 				default:
 					log_i("Audio task: error");
 					break;
@@ -140,6 +146,12 @@ bool audioIsPlaying(void)
 void audioStopSong()
 {
 	audioTxMessage.cmd = AUDIO_STOP;
+	audioMessage_t RX = transmitReceive(audioTxMessage);
+}
+// ---------------------------------------------------------------
+void audioPauseResume()
+{
+	audioTxMessage.cmd = PAUSE_RESUME;
 	audioMessage_t RX = transmitReceive(audioTxMessage);
 }
 // ---------------------------------------------------------------

@@ -13,12 +13,12 @@ bool CYD_MP3Player::begin() {
 }
 
 /*--------------------------------------------------------------------------------
-* Verify file extension. (mp3, m4a, aac, wav, flac, opus, ogg, oga)
-*--------------------------------------------------------------------------------*/
-bool CYD_MP3Player::VerifyExt(const char* file) {
+ * Verify file extension. (mp3, m4a, aac, wav, flac, opus, ogg, oga)
+ *--------------------------------------------------------------------------------*/
+bool CYD_MP3Player::CheckExtension(const char* path) {
   const char* ext[] = {".mp3", ".m4a", ".wav"};
   for (int i = 0; i < sizeof(ext) / sizeof(ext[0]); i++) {
-    if (strcmp(&file[strlen(file) - strlen(ext[i])], ext[i]) == 0) {
+    if (strcmp(&path[strlen(path) - strlen(ext[i])], ext[i]) == 0) {
       return true;
     }
   }
@@ -26,8 +26,8 @@ bool CYD_MP3Player::VerifyExt(const char* file) {
 }
 
 /*--------------------------------------------------------------------------------
-* Scan and create a list of audio m_files in a specified directory.
-*--------------------------------------------------------------------------------*/
+ * Scan and create a list of audio m_files in a specified directory.
+ *--------------------------------------------------------------------------------*/
 void CYD_MP3Player::ScanFileList(const char *dirname, uint8_t levels) {
   File root = m_fs.open(dirname);
   if (!root) {
@@ -48,7 +48,8 @@ void CYD_MP3Player::ScanFileList(const char *dirname, uint8_t levels) {
 #ifdef SDFATFS_USED
     char name[BUF_SIZE];
     file.getName(name, sizeof(name));
-    std::string path = std::string(dirname) + "/" + std::string(name);
+    std::string path = std::string(dirname);
+    path += (path.at(path.size() - 1) == '/' ? "" : "/") + std::string(name);
     if (file.isHidden()) {
       // Serial.printf("%s is skipped.\n", name);
     }
@@ -70,11 +71,11 @@ void CYD_MP3Player::ScanFileList(const char *dirname, uint8_t levels) {
     else if (!isDir) {
       try {
 #ifdef SDFATFS_USED
-        if (VerifyExt(path.c_str())) {
+        if (CheckExtension(path.c_str())) {
           m_files.push_back({path});
         }
 #else
-        if (VerifyExt(file.path())) {
+        if (CheckExtension(file.path())) {
           m_files.push_back({file.path()});
         }
 #endif
@@ -89,14 +90,14 @@ void CYD_MP3Player::ScanFileList(const char *dirname, uint8_t levels) {
 }
 
 /*--------------------------------------------------------------------------------
-* Sort file list
-*--------------------------------------------------------------------------------*/
+ * Sort file list
+ *--------------------------------------------------------------------------------*/
 void CYD_MP3Player::SortFileList(bool shuffle) {
   if (shuffle) {
     std::mt19937 engine(esp_random());
     std::shuffle(m_files.begin(), m_files.end(), engine);
   } else {
-    std::sort(m_files.begin(), m_files.end(), [](FileInfo_t &a, FileInfo_t &b) {
+    std::sort(m_files.begin(), m_files.end(), [](PlayList_t &a, PlayList_t &b) {
       return a.path.compare(b.path) > 0 ? true : false;
     });
   }
@@ -107,8 +108,8 @@ void CYD_MP3Player::SortFileList(bool shuffle) {
 }
 
 /*--------------------------------------------------------------------------------
-* Operation
-*--------------------------------------------------------------------------------*/
+ * Operation
+ *--------------------------------------------------------------------------------*/
 void CYD_MP3Player::SetVolume(uint8_t vol) {
   audioSetVolume(vol);
 }
@@ -121,14 +122,8 @@ bool CYD_MP3Player::IsPlaying(void) {
   return audioIsPlaying();
 }
 
-void CYD_MP3Player::StopPlay(void) {
-  audioStopSong();
-}
-
 bool CYD_MP3Player::FilePlay(const char* path) {
-  if (audioIsPlaying()) {
-    audioStopSong();
-  }
+  audioStopSong();
   if (audioConnecttoSD(path)) {
     return true;
   } else {
@@ -137,53 +132,33 @@ bool CYD_MP3Player::FilePlay(const char* path) {
   }
 }
 
+void CYD_MP3Player::StopPlay(void) {
+  audioStopSong();
+}
+
+void CYD_MP3Player::PauseResume(void) {
+  audioPauseResume();
+}
+
+void CYD_MP3Player::SetPlayNo(uint32_t playNo) {
+  uint32_t size = m_files.size();
+  m_playNo = (playNo + size) % m_files.size();
+}
+
+void CYD_MP3Player::PlayNext(void) {
+  audioStopSong();
+  SetPlayNo(m_playNo + 1);
+}
+
+void CYD_MP3Player::PlayPrev(void) {
+  audioStopSong();
+  SetPlayNo(m_playNo - 1);
+}
+
 void CYD_MP3Player::AutoPlay(void) {
   if (!audioIsPlaying() && m_files.size()) {
     if (!audioConnecttoSD(m_files[m_playNo].path.c_str())) {
       Serial.printf("skip %s\n", m_files[m_playNo].path.c_str());
-      m_files.erase(m_files.begin() + m_playNo);
-    } else {
-      m_playNo = (m_playNo + 1) % m_files.size();
     }
   }
-}
-
-/*--------------------------------------------------------------------------------
- * Optional functions for audio-I2S
- *--------------------------------------------------------------------------------*/
-void audio_info(const char *info) {
-  Serial.print("info        ");
-  Serial.println(info);
-}
-void audio_id3data(const char *info) {  //id3 metadata
-  Serial.print("id3data     ");
-  Serial.println(info);
-}
-void audio_eof_mp3(const char *info) {  //end of file
-  Serial.print("eof_mp3     ");
-  Serial.println(info);
-}
-void audio_showstation(const char *info) {
-  Serial.print("station     ");
-  Serial.println(info);
-}
-void audio_showstreamtitle(const char *info) {
-  Serial.print("streamtitle ");
-  Serial.println(info);
-}
-void audio_bitrate(const char *info) {
-  Serial.print("bitrate     ");
-  Serial.println(info);
-}
-void audio_commercial(const char *info) {  //duration in sec
-  Serial.print("commercial  ");
-  Serial.println(info);
-}
-void audio_icyurl(const char *info) {  //homepage
-  Serial.print("icyurl      ");
-  Serial.println(info);
-}
-void audio_lasthost(const char *info) {  //stream URL played
-  Serial.print("lasthost    ");
-  Serial.println(info);
 }
