@@ -143,19 +143,20 @@ void CYD_MP3Player::PauseResume(void) {
   audioPauseResume();
 }
 
-void CYD_MP3Player::SetPlayNo(uint32_t playNo) {
+void CYD_MP3Player::SetPlayNo(uint32_t playNo, bool stop) {
+  if (stop) {
+    audioStopSong();
+  }
   uint32_t size = m_files.size();
   m_playNo = (playNo + size) % m_files.size();
 }
 
-void CYD_MP3Player::PlayNext(void) {
-  audioStopSong();
-  SetPlayNo(m_playNo + 1);
+void CYD_MP3Player::PlayNext(bool stop) {
+  SetPlayNo(m_playNo + 1, stop);
 }
 
-void CYD_MP3Player::PlayPrev(void) {
-  audioStopSong();
-  SetPlayNo(m_playNo - 1);
+void CYD_MP3Player::PlayPrev(bool stop) {
+  SetPlayNo(m_playNo - 1, stop);
 }
 
 void CYD_MP3Player::AutoPlay(void) {

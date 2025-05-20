@@ -69,9 +69,9 @@ public:
   bool        FilePlay(const char* path);
   void        StopPlay(void);
   void        PauseResume(void);
-  void        SetPlayNo(uint32_t playNo);
-  void        PlayNext(void);
-  void        PlayPrev(void);
+  void        SetPlayNo(uint32_t playNo, bool stop = true);
+  void        PlayNext(bool stop = true);
+  void        PlayPrev(bool stop = true);
   void        AutoPlay(void);
 };
 /*
