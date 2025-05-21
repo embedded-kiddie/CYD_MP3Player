@@ -125,6 +125,10 @@ bool CYD_MP3Player::IsPlaying(void) {
   return audioIsPlaying();
 }
 
+bool CYD_MP3Player::IsLastSong(void) {
+  return m_playNo == m_files.size() - 1;
+}
+
 bool CYD_MP3Player::FilePlay(const char* path) {
   audioStopSong();
   if (audioConnecttoSD(path)) {
