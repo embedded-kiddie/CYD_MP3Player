@@ -152,7 +152,9 @@ void CYD_MP3Player::SetPlayNo(uint32_t playNo, bool stop) {
     audioStopSong();
   }
   uint32_t size = m_files.size();
-  m_playNo = (playNo + size) % m_files.size();
+  if (size) {
+    m_playNo = (playNo + size) % size;
+  }
 }
 
 void CYD_MP3Player::PlayNext(bool stop) {

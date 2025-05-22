@@ -59,7 +59,7 @@ public:
   bool        begin(void);
   uint32_t    GetPlayNo(void) { return m_playNo; }
   uint32_t    GetCounts(void) { return m_files.size(); }
-  const char* GetPath(uint32_t playNo) { return m_files[playNo].path.c_str(); }
+  const char* GetPath(uint32_t playNo) { return m_files.size() ? m_files[playNo].path.c_str() : ""; }
   void        ScanFileList(const char *dirname, uint8_t levels);
   void        SortFileList(bool shuffle = false);
 
