@@ -108,6 +108,7 @@ void CYD_MP3Player::SortFileList(bool shuffle) {
   for (auto& file : m_files) {
     Serial.println(file.path.c_str());
   }
+  Serial.printf("Total: %d\n", m_files.size());
 }
 
 /*--------------------------------------------------------------------------------
