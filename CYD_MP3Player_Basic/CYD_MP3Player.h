@@ -23,11 +23,15 @@
 
 typedef struct {
   std::string path;
+  bool        selected;
+} PlayList_t;
+
+typedef struct {
   std::string title;
   std::string artist;
   std::string album;
   uint32_t    duration;
-} PlayList_t;
+} ID3Tags_t;
 
 /*--------------------------------------------------------------------------------
  * Definition of SPI file system for audio files
@@ -41,7 +45,7 @@ typedef struct {
 #if defined (SDFATFS_USED)  // defined in CYD_Audio.h
 #define FS_DEV    SD_SDFAT  // defined in CYD_Audio.cpp
 #define FS_CONFIG SD_CS, SD_CLOCK
-#define BUF_SIZE  64
+#define BUF_SIZE  128       // at least 97 = title(30) + "/" + artist(30) + "/" + album(30) + ".mp3" + '\0'
 #elif defined (_SD_H_)
 #define FS_DEV    SD
 #define FS_CONFIG SD_CS, SPI, SD_CLOCK
@@ -73,7 +77,7 @@ public:
   void        SetPlayNo(uint32_t playNo, bool stop = true);
   void        PlayNext(bool stop = true);
   void        PlayPrev(bool stop = true);
-  void        AutoPlay(void);
+  bool        AutoPlay(bool selectedOnly = false);
 };
 /*
 void audio_info(const char *info);

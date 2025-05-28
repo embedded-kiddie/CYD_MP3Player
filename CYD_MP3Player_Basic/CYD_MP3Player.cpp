@@ -166,10 +166,20 @@ void CYD_MP3Player::PlayPrev(bool stop) {
   SetPlayNo(m_playNo - 1, stop);
 }
 
-void CYD_MP3Player::AutoPlay(void) {
+bool CYD_MP3Player::AutoPlay(bool selectedOnly) {
   if (!audioIsPlaying() && m_files.size()) {
-    if (!audioConnecttoSD(m_files[m_playNo].path.c_str())) {
-      Serial.printf("skip %s\n", m_files[m_playNo].path.c_str());
+    // Play all or selected only
+    bool play = !selectedOnly || m_files[m_playNo].selected;
+
+    if (play && !audioConnecttoSD(m_files[m_playNo].path.c_str())) {
+      Serial.printf("skip: %s\n", m_files[m_playNo].path.c_str()); // Something is wrong, so skip it
+      play = false;
+    } else {
+      play = true;
     }
+
+    return play;
   }
+
+  return true;
 }
