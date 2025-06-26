@@ -16,7 +16,7 @@ typedef enum : uint8_t
 	CONNECTTOSPEECH,
 	CONNECTTOSD,
 	AUDIO_STOP,
-  PAUSE_RESUME,
+	PAUSE_RESUME,
 }audioCmd_t;
 
 /**

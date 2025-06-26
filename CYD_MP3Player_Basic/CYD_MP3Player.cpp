@@ -7,7 +7,7 @@
  * Begin with SD or SdFat
  *--------------------------------------------------------------------------------*/
 bool CYD_MP3Player::begin() {
-  if (FS_DEV.begin(FS_CONFIG)) {
+  if (SD.begin(FS_CONFIG)) {
     return true;
   } else {
     Serial.println("Failed to mount the file system.");
@@ -166,20 +166,12 @@ void CYD_MP3Player::PlayPrev(bool stop) {
   SetPlayNo(m_playNo - 1, stop);
 }
 
-bool CYD_MP3Player::AutoPlay(bool selectedOnly) {
+bool CYD_MP3Player::AutoPlay(void) {
   if (!audioIsPlaying() && m_files.size()) {
-    // Play all or selected only
-    bool play = !selectedOnly || m_files[m_playNo].selected;
-
-    if (play && !audioConnecttoSD(m_files[m_playNo].path.c_str())) {
-      Serial.printf("skip: %s\n", m_files[m_playNo].path.c_str()); // Something is wrong, so skip it
-      play = false;
-    } else {
-      play = true;
+    if (!audioConnecttoSD(m_files[m_playNo].path.c_str())) {
+      Serial.printf("Failed to play %s\n", m_files[m_playNo].path.c_str());
+      return false;
     }
-
-    return play;
   }
-
   return true;
 }
