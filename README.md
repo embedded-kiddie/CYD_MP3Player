@@ -17,7 +17,7 @@ It creates a task named `audioplay` on ESP32 core 0 and sends commands to contro
 This sketch is an example of applying a wrapper class that scans for audio files on an SD card, creates a playlist, and controls playback.
 
 ## CYD_MP3Player_LVGL
-SDThis version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
+This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
 
 # Special Thanks
 - [hexeguitar/ESP32_TFT_PIO][1] (published under the MIT license)
