@@ -19,7 +19,7 @@ This sketch is an example of applying a wrapper class that scans for audio files
 ## CYD_MP3Player_LVGL
 This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
 
-# Special Thanks
+## Special Thanks
 - [hexeguitar/ESP32_TFT_PIO][1] (published under the MIT license)
 
 [1]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
