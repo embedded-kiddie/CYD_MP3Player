@@ -38,89 +38,22 @@
   
   You can also set the time until the backlight turns off and the sleep timer.
 
-## 3. Hardware Requirements: ESP32-2432S028R (AKA CYD)
+## 3. Software Requirements
 
-### 3.1. Use Internal DAC and Onboard Amplifier
-Connect a speaker to the terminal on board. However, its sound will be quite terrible, so you will need to adjust the SB8002B's amplifier gain by changing the surrounding resistors.
-
-<details>
-<summary>ILI9341/ST7789 and amplifier IC SC8002B schematics</summary>
-
-![ILI9341 vs ST7789](assets/CYD-ILI9341-ST7789.jpg)
-</details>
-
-The following links are good resources to help you solve this problem.
-
-- [Audio amp gain mod - ESP32-2432S028 aka Cheap Yellow Display example project][20].
-- [ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube][21]
-
-Even when I changed the resistors of ST7789 to the same as ILI9341, the high frequencies were crushed and the sound became rough, making it unsuitable for listening to the music, so I ended up doing the following:
-
-#### ILI9341 modification
-<details>
-<summary>Decrease the resistance value of R9</summary>
-
-![Decrease the resistance value of R9](assets/CYD-ILI9341-SC8002B.jpg)
-</details>
-
-#### ST7789 modification
-<details>
-<summary>Replace resistors R8 and R9</summary>
-
-| Resister | Before modification | After modification |
-| :------: | ------------------: | -----------------: |
-| R7       | 0 Ω                 | 0 Ω                |
-| R8       | 0 Ω                 | 22 KΩ              |
-| R9       | 68 KΩ               | 10 KΩ              |
-</details>
-
-#### 440 Hz/sine wave sound test
-<details>
-<summary>Oscilloscope observation results</summary>
-
-![ILI9341 vs ST7789](assets/CYD-SineWave-400Hz.jpg)
-
-![ILI9341 vs ST7789](assets/CYD-SineWave-All.jpg)
-</details>
-
-### 3.2. Use External DAC and Amplifier
-The links below explain how to connect external DAC modules.
-
-- [Audio I2S mod - ESP32-2432S028 aka Cheap Yellow Display example project][22]
-- [CYD’s Note 2025 - macsbug][23]
-
-In this case, please define the symbol `USE_I2S_DAC` and each pin appropriately in [audioTask() in CYD28_audio.cpp](CYD28_audio.cpp#L35-L43).
-
-```c++
-void audioTask(void *parameter)
-{
-	// if using the I2S mod, RGB led is removed, I2S pinout defined in platformio.ini file
-#ifdef USE_I2S_DAC
-	audio.begin();
-	audio.setPinout(I2S_BCK_PIN, I2S_LRCLK_PIN, I2S_DIN_PIN);
-#else
-	audio.begin(true, I2S_DAC_CHANNEL_LEFT_EN);
-#endif
-...
-}
-```
-
-## 4. Software Requirements
-
-### 4.1. Arduino IDE
+### 3.1. Arduino IDE
 | Name                       | Version      |
 | -------------------------- | ------------ |
 | Arduino IDE                | 2.3.4 and up |
 
 
-### 4.2. Platform board package
+### 3.2. Platform board package
 | Name                       | Version     |
 | -------------------------- | ----------- |
 | esp32 by Espressif Systems | 2.0.17 [^2] |
 
 Select [ESP32 Dev Module][2] as a board.
 
-### 4.3. Libraries
+### 3.3. Libraries
 | Name                                | Version      |
 | ----------------------------------- | ------------ |
 | [LVGL][4] by kisvegabor             | 9.2.2 and up |
@@ -128,7 +61,7 @@ Select [ESP32 Dev Module][2] as a board.
 | [SdFat][6] by Bill Greiman          | 2.3.0        |
 | [ArduinoJson][7] by Benoit Blanchon | 7.4.2        |
 
-### 4.4. Library configuration
+### 3.4. Library configuration
 
 - **LVGL**  
   After installing LVGL, configure `lv_conf.h` by referring to the official document "[Configure LVGL][8]". Some samples of `lv_conf.h` for this application are provided in the [assets/lv_conf/](assets/lv_conf). For details, see [assets/lv_conf/README.md](assets/lv_conf/README.md).
@@ -136,18 +69,18 @@ Select [ESP32 Dev Module][2] as a board.
 - **SdFat**  
   To handle long filenames and multibyte characters, uncomment the definition of the symbol `USE_UTF8_LONG_NAMES` in [libraries/SdFat/src/SdFatConfig.h][9] under your sketchbook folder.
 
-### 4.5. Custom Fonts
+### 3.5. Custom Fonts
 In addition to LVGL's fonts, this application embeds several national alphabets and symbols of **12px** and **14px**, as well as Japanese Kanji Level 1 and Level 2.
 
 To create custom fonts, refer to [assets/fonts/README.md](assets/fonts/README.md) and use [LVGL Font Converter][10] to create/download the font data, save them to [src/](src), and modify [ui.h](ui.h#L16-L27).
 
-## 5. Edit and Compile / Upload
+## 4. Edit and Compile / Upload
 
-### 5.1. Edit config.h
+### 4.1. Edit config.h
 
 Open [`config.h`](config.h) in the Arduino IDE and follow the comments to modify the default settings as desired.
 
-### 5.2. Compile / Upload
+### 4.2. Compile / Upload
 Set the following two items from the "**Tools**" menu in the Arduino IDE.
 
 | Item             | Selection                              |
@@ -155,7 +88,7 @@ Set the following two items from the "**Tools**" menu in the Arduino IDE.
 | Partition Scheme | **"Huge App (3MB No OTA/1MB SPIFFS)"** |
 | Upload Speed     | **"460800"** (Mac), **"921600"** (Win) |
 
-## 6. How To Use
+## 5. How To Use
 This application is designed to take albums ripped from CDs and save them directly to your SD card. In addition to `.mp3`, the `.m4a` and `.wav` audio file formats are supported.
 
 **Note for Mac users:** If a large number of dot files are created on the SD card, it will take a long time to search for audio files. In order to avoid this, use the Terminal app to navigate to the directory containing the audio files (e.g. `NO NAME/MP3/`) and execute the following command to delete them.
@@ -165,12 +98,12 @@ This application is designed to take albums ripped from CDs and save them direct
 % find . -name ".???*" -print -exec /bin/rm -rf {} \;
 ```
 
-### 6.1. About "Partition"
+### 5.1. About "Partition"
 Due to the SRAM capacity of MCU, if you plan to store a large number of albums, it is recommended that you create subfolders (up to 5) and limit the number of albums to arround 50 titles and the number of music files to arround 600+α, in each subfolder.
 
 In this application, such subfolder is named as "Partition" and can be selected in the **"Setting"** screen.
 
-### 6.2. Shuffle Mode
+### 5.2. Shuffle Mode
 "**Shuffle**" works as bellow:
 
 - (1) continues to randomly select and add albums to the playlist until the total number of music files exceeds 600+α
@@ -180,29 +113,29 @@ However, due to the "600+α" limitation for music files, when "**Shuffle**" is O
 
 When you select an individual partition, albums will be added to the playlist in ascending order, but when you select "**All**", only (1) will be performed.
 
-### 6.3. Album List
+### 5.3. Album List
 Pressing the "**Keyboard**" button under the dropdown will create an empty list, so enter a list name, close the keyboard, select the album you want to add, and finally press the "**Save**" button.
 
 ![Album List](assets/CYD-MP3Player-AlbumList.gif)
 
 The "**Keyboard**" button is also used to edit an existing list.
 
-### 6.4. Album Cover Photo
+### 5.4. Album Cover Photo
 The "**Main Screen**" displays one of the 10 default images randomly. Besides the default image, you can put an album cover photo named `@photo.jpg` to your album folder.
 
 Due to memory capacity limitations of the MCU, this `@photo.jpg` must be 96x96 and its size must be 6KB or less.
 
 To generate the `@photo.jpg` image, use something like [GIMP][11] and it's good to set the compression rate to around 50-75%.
 
-### 6.5. Backlight / Sleep Timer
+### 5.5. Backlight / Sleep Timer
 The "**Backlight**" setting not only turns off the LCD illumination but also stops the clock to the LCD, reducing power consumption by approximately 40%.
 
 The "**Sleep Timer**" will put the MCU into deep sleep mode after the set time has elapsed. To recover from this state, press the reset button or cycle the power.
 
-### 6.6. Auto Saving
+### 5.6. Auto Saving
 Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**", etc.) are automatically saved to the SD card between songs or when you pause playback, and are restored when you power cycle the device.
 
-## 7. Known Issues
+## 6. Known Issues
 
 - Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.
 
@@ -221,7 +154,7 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
 
 - "**Bluetooth**" icon at the top left on "**Main**" screen is not supported yet 😅
 
-## 8. Credits
+## 7. Credits
 Thanks to the [ESP32 I2S audio library][14] in [hexeguitar/ESP32_TFT_PIO][15] (MIT license). This application includes a customized version of the `CYD_Audio` library.
 
 Also thanks to the high quality photos under the [license by Unsplash][16].
@@ -237,7 +170,7 @@ Also thanks to the high quality photos under the [license by Unsplash][16].
 - [Rohit Choudhari](https://unsplash.com/photos/giant-ribcage-structure-in-a-pink-field-with-cherry-blossoms-Ph527s59P_M "Giant ribcage structure in a pink field with cherry blossoms photo – Free Digital image Image on Unsplash")
 - [Vincent Tint](https://unsplash.com/photos/city-skyline-across-a-wide-body-of-water-hFQ39GIBPdI "City skyline across a wide body of water. photo – Free Sunset Image on Unsplash")
 
-## 9. Have Fun!
+## 8. Have Fun!
 If you find any issues or have suggestions, please report in [Issues][12] or [Discussions][13] 🥰
 
 ----------
@@ -262,8 +195,3 @@ If you find any issues or have suggestions, please report in [Issues][12] or [Di
 [14]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
 [15]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
 [16]: https://unsplash.com/license "License｜Unsplash"
-
-[20]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-amp-gain-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
-[21]: https://www.youtube.com/watch?v=6JCLHIXXVus "ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube"
-[22]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-i2s-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
-[23]: https://macsbug.wordpress.com/2025/04/18/cyds-note-2025/ "CYD&#8217;s Note 2025 | macsbug"
