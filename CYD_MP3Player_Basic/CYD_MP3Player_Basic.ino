@@ -1,34 +1,27 @@
-// All necessary files are included
-#include "CYD_MP3Player.h"
-CYD_MP3Player player;
+#include "CYD28_audio.h"
 
-/*--------------------------------------------------------------------------------
- * Setup and Loop
- *--------------------------------------------------------------------------------*/
 void setup() {
   Serial.begin(115200);
   while (millis() < 1000);
 
-  audioInit();
+  if (!SD.begin()) {
+    Serial.println("Cannot begin SD.");
+    while (1);
+  }
 
-  player.begin();
-  player.ScanFileList("/", 3);
-  player.SortFileList(true);
-  player.SetVolume(8);
+  audioInit();  // Create a task to play audio file
+  delay(10);    // Wait until the task on Core 1 is ready to receive a command
+  audioConnecttoSD("/sample.mp3");
 }
 
 void loop() {
-  player.AutoPlay();
-
   if (Serial.available() > 0) {
     int v = Serial.readStringUntil('\n').toInt();
-    player.SetVolume((uint8_t)constrain(v, 0, 21));
+    audioSetVolume((uint8_t)constrain(v, 0, 21));
   }
 }
 
-/*--------------------------------------------------------------------------------
- * Optional functions for audio-I2S
- *--------------------------------------------------------------------------------*/
+// optional
 void audio_info(const char *info) {
   Serial.print("info        ");
   Serial.println(info);
@@ -40,9 +33,6 @@ void audio_id3data(const char *info) {  //id3 metadata
 void audio_eof_mp3(const char *info) {  //end of file
   Serial.print("eof_mp3     ");
   Serial.println(info);
-
-  // play next
-  player.PlayNext(false);
 }
 void audio_showstation(const char *info) {
   Serial.print("station     ");

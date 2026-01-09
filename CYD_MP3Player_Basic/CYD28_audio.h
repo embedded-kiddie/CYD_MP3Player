@@ -16,7 +16,6 @@ typedef enum : uint8_t
 	CONNECTTOSPEECH,
 	CONNECTTOSD,
 	AUDIO_STOP,
-	PAUSE_RESUME,
 }audioCmd_t;
 
 /**
@@ -44,7 +43,6 @@ bool audioConnecttohost(const char *host);
 bool audioConnecttoSD(const char *filename);
 bool audioConnecttoSpeech(const char *host, const char *lang);
 void audioStopSong();
-void audioPauseResume();
 void setVuMeters(uint32_t vuRL);
 
 #endif // _AUDIO_H_

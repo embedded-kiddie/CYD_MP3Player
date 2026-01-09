@@ -104,12 +104,6 @@ void audioTask(void *parameter)
 					audioTxTaskMessage.ret = 1;
 					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
-				case PAUSE_RESUME:
-					audioTxTaskMessage.cmd = PAUSE_RESUME;
-					audio.pauseResume();
-					audioTxTaskMessage.ret = 1;
-					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
-					break;
 				default:
 					log_i("Audio task: error");
 					break;
@@ -146,12 +140,6 @@ bool audioIsPlaying(void)
 void audioStopSong()
 {
 	audioTxMessage.cmd = AUDIO_STOP;
-	audioMessage_t RX = transmitReceive(audioTxMessage);
-}
-// ---------------------------------------------------------------
-void audioPauseResume()
-{
-	audioTxMessage.cmd = PAUSE_RESUME;
 	audioMessage_t RX = transmitReceive(audioTxMessage);
 }
 // ---------------------------------------------------------------
