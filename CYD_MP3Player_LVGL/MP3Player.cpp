@@ -264,7 +264,7 @@ uint32_t MP3Player::GetPhotoNo(uint32_t playNo) {
 
   // Gets the photo number recorded in ALBUM_PHOTO_FILE.txt
   std::string path = GetDirPath(playNo);
-  path.append(ALBUM_PHOTO_FILE "txt");
+  path.append(ALBUM_PHOTO_FILE ".txt");
 
   File fd = SD.open(path.c_str(), FILE_READ);
   if (fd) {
