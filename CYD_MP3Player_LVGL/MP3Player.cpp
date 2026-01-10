@@ -32,7 +32,7 @@ bool MP3Player::begin(const char *root, uint8_t volume) {
   }
 
 #if MY_USE_FS_ARDUINO_SD
-  // LVGL SD File System for displaying cover pictures
+  // LVGL SD File System for displaying cover photos
   lv_fs_arduino_sd_init();
 #endif
 
@@ -257,12 +257,12 @@ void MP3Player::ClearAudioFiles(void) {
 }
 
 //--------------------------------------------------------------------------------
-// Load the picture number stored in the metadata on the SD card
+// Load the photo number stored in the metadata on the SD card
 //--------------------------------------------------------------------------------
-uint32_t MP3Player::GetPictureNo(uint32_t playNo) {
+uint32_t MP3Player::GetPhotoNo(uint32_t playNo) {
   uint32_t pictNo = 0;
 
-  // Gets the picture number recorded in PICTURE_FILE.
+  // Gets the photo number recorded in ALBUM_PHOTO_FILE.txt
   std::string path = GetDirPath(playNo);
   path.append(ALBUM_PHOTO_FILE "txt");
 

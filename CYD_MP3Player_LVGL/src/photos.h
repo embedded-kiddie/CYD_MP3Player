@@ -1,5 +1,5 @@
-#ifndef _PICTURES_H_
-#define _PICTURES_H_
+#ifndef _PHOTOS_H_
+#define _PHOTOS_H_
 
 LV_IMAGE_DECLARE(img_album);
 LV_IMAGE_DECLARE(Annie_Spratt);
@@ -13,7 +13,7 @@ LV_IMAGE_DECLARE(Pranav_Nav);
 LV_IMAGE_DECLARE(Rohit_Choudhari);
 LV_IMAGE_DECLARE(Vincent_Tint);
 
-const lv_image_dsc_t *pictures[] = {
+const lv_image_dsc_t *photos[] = {
   /*  0 */  & img_album,
   /*  1 */  & Annie_Spratt,
   /*  2 */  & BoliviaInteligente,
@@ -27,6 +27,6 @@ const lv_image_dsc_t *pictures[] = {
   /* 10 */  & Vincent_Tint,
 };
 
-#define N_PICTURES  (sizeof(pictures) / sizeof(lv_image_dsc_t *))
+#define N_PHOTOS  (sizeof(photos) / sizeof(lv_image_dsc_t *))
 
-#endif // _PICTURES_H_
+#endif // _PHOTOS_H_

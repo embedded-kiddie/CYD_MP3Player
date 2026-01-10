@@ -139,7 +139,7 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
 
 - Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.
 
-```
+```c++
 /Users/xxxx/Documents/Arduino/libraries/SdFat/src/FsLib/FsNew.h:44:48: warning: optimization attribute on 'void* operator new(size_t, newalign_t*)' follows definition but the attribute doesn't match [-Wattributes]
  void* operator new(size_t size, newalign_t* ptr);
                                                 ^
@@ -150,7 +150,11 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
 
 - When using the built-in DAC and amplifier, there will be a "click" sound when powering up and when pausing/resume playback.
 
+- The UI screen is designed for a 240x320 resolution only and is not responsive.
+
 - It has been observed that `@photo.jpg` does not display depending on the tool that generates/compresses JPEG images. If the album cover photo is not displayed, please recreate it using [GIMP][11] or similar.
+
+- The elapsed playing time is an estimate by the I2S audio library and may differ from the actual playing time. Please consider it as just a UI effect.
 
 - "**Bluetooth**" icon at the top left on "**Main**" screen is not supported yet 😅
 

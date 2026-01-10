@@ -1,27 +1,29 @@
 # CYD MP3 Music Player
-MP3 player with internal DAC for Cheap Yellow Display
+MP3 music player for Cheap Yellow Display
 
-## Software & Application
+## Library & Sketches
 
-### CYD_Audio
+### [CYD_Audio](CYD_Audio)
 This library is derived from [hexeguitar/ESP32_TFT_PIO][1], which was created for PlatformIO.
 
 This derivative has been modified for Arduino so that it can be installed in the `libraries` folder in your Arduino sketchbook folder.
 
-### CYD_MP3Player_Basic
+### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
 This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.
 
-The `CYD_Audio` class creates a task called `audioplay` on ESP32 core 0 and controls playback, stop, volume up/down, etc. by sending messages from core 1.
+The `CYD_Audio` class creates a task called `audioplay` on ESP32 core 0. To control play, stop, volume up/down, etc., send messages to the `audioplay` task from core 1.
 
-### CYD_MP3Player_Simple
-This sketch is an example of applying the `CYD_Audio` wrapper class to scan the audio files on the SD card, create a playlist, and control the playback order.
+### [CYD_MP3Player_Simple](CYD_MP3Player_Simple)
+This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Player` to scan the audio files on the SD card, create a playlist, and control the playback order.
 
-### CYD_MP3Player_LVGL
+### [CYD_MP3Player_LVGL](CYD_MP3Player_LVGL)
 This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
+
+The `MP3Player` class has been extended to meet the requirements of UI components.
 
 ## Hardware modification
 
-The CYD has a speaker terminal, but the sound quality is quite poor, so if you want to listen to music properly, you'll need to improve the hardware.
+Although CYD has a speaker terminal, the sound quality is quite poor, so if you want to listen to music properly, you will need to improve the hardware.
 
 ### Use Internal DAC and Onboard Amplifier
 The circuitry around the onboard audio amplifier (SB8002B) requires to adjust the amplifier gain by changing the associated resistors.
@@ -65,6 +67,8 @@ Even when I changed the resistors of ST7789 to the same as ILI9341, the high fre
 
 ![ILI9341 vs ST7789](images/CYD-SineWave-All.jpg)
 </details>
+
+The results show that the audio amplifier IC SC8002B is not suitable for music playback.
 
 ### Use External DAC and Amplifier
 The links below explain how to connect external DAC modules.

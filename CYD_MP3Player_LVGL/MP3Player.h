@@ -95,7 +95,7 @@ public:
   uint32_t    GetCounts(void) { return m_list.size(); }
   std::string GetDirPath  (uint32_t playNo);
   std::string GetFilePath (uint32_t playNo);
-  uint32_t    GetPictureNo(uint32_t playNo);
+  uint32_t    GetPhotoNo  (uint32_t playNo);
   void        GetID3Tags  (uint32_t playNo, MP3Tags_t &tags);
   void        GetMetaData (uint32_t playNo, MP3Meta_t *meta);
   bool        PutMetaData (uint32_t playNo, MP3Meta_t *meta);

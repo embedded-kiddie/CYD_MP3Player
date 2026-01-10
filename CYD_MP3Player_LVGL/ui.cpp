@@ -37,16 +37,16 @@ static uint32_t prev = 0; for (uint32_t now = millis(); now - prev >= period; pr
 
 ////////////////////// LOCAL FUNCTIONS //////////////////////
 //--------------------------------------------------------------------------------
-// Display a covoer picture on SD or flash
+// Display a covoer photo on SD or flash
 //--------------------------------------------------------------------------------
-static void display_picture(uint32_t playNo) {
-  static constexpr lv_style_const_prop_t style_prop_picture[] = {
+static void display_photo(uint32_t playNo) {
+  static constexpr lv_style_const_prop_t style_prop_photo[] = {
     LV_STYLE_CONST_SHADOW_WIDTH(10),
     LV_STYLE_CONST_SHADOW_OFFSET_Y(5),
     LV_STYLE_CONST_SHADOW_OPA(LV_OPA_40),
     LV_STYLE_CONST_PROPS_END
   };
-  static LV_STYLE_CONST_INIT(style_picture, (void*)style_prop_picture);
+  static LV_STYLE_CONST_INIT(style_photo, (void*)style_prop_photo);
 
   // Display an image file on SD card
   char buf[BUF_SIZE], *ptr;
@@ -63,7 +63,7 @@ static void display_picture(uint32_t playNo) {
     strcpy(ptr + 1, ALBUM_PHOTO_FILE ALBUM_PHOTO_EXT);
     if (SD.exists(buf + 2)) {
       lv_image_set_src(ui_AlbumImage, buf);
-      lv_obj_add_style(ui_AlbumImage, &style_picture, 0);
+      lv_obj_add_style(ui_AlbumImage, &style_photo, 0);
       return;
     }
   }
@@ -73,26 +73,26 @@ static void display_picture(uint32_t playNo) {
     strncpy(ptr, ALBUM_PHOTO_EXT, sizeof(ALBUM_PHOTO_EXT));
     if (SD.exists(buf + 2)) {
       lv_image_set_src(ui_AlbumImage, buf);
-      lv_obj_add_style(ui_AlbumImage, &style_picture, 0);
+      lv_obj_add_style(ui_AlbumImage, &style_photo, 0);
       return;
     }
   }
 
-#ifdef _PICTURES_H_
+#ifdef _PHOTOS_H_
   #if true
     // Display an image file on flash ROM at random
-    int pictNo = millis() % (N_PICTURES - 1) + 1;
-    lv_image_set_src(ui_AlbumImage, pictures[pictNo]);
-    lv_obj_add_style(ui_AlbumImage, &style_picture, 0);
+    int pictNo = millis() % (N_PHOTOS - 1) + 1;
+    lv_image_set_src(ui_AlbumImage, photos[pictNo]);
+    lv_obj_add_style(ui_AlbumImage, &style_photo, 0);
   #else
-    // Display an image specified by the number in @picture.txt
-    int pictNo = player.GetPictureNo(playNo);
-    if (0 < pictNo && pictNo < N_PICTURES) {
-      lv_image_set_src(ui_AlbumImage, pictures[pictNo]);
-      lv_obj_add_style(ui_AlbumImage, &style_picture, 0);
+    // Display an image specified by the number in @photo.txt
+    int pictNo = player.GetPhotoNo(playNo);
+    if (0 < pictNo && pictNo < N_PHOTOS) {
+      lv_image_set_src(ui_AlbumImage, photos[pictNo]);
+      lv_obj_add_style(ui_AlbumImage, &style_photo, 0);
     } else {
       lv_image_set_src    (ui_AlbumImage, &img_album);
-      lv_obj_remove_style (ui_AlbumImage, &style_picture, 0);
+      lv_obj_remove_style (ui_AlbumImage, &style_photo, 0);
     }
   #endif
 #endif
@@ -121,7 +121,7 @@ static bool play_next(bool next) {
   bitClear(ui_setting.repeat, 7); // clear the bit that has been temporarily forced set
 
   ui_control.playNo = ui_control.focusNo = player.GetPlayNo();
-  display_picture(ui_control.playNo);
+  display_photo(ui_control.playNo);
 
   // Update ui_control and look of the play button
   lv_obj_set_state(ui_ButtonPlay, LV_STATE_CHECKED, true);
@@ -649,7 +649,7 @@ void ui_set_playNo(uint32_t track_id) {
 
   // Update ui_control
   ui_control.playNo = ui_control.focusNo = track_id;
-  display_picture(track_id);
+  display_photo(track_id);
 
   // Update the look of the play button
   if (ui_state != UI_STATE_PLAY) {
