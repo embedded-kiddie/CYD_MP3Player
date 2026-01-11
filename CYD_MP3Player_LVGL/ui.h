@@ -61,11 +61,20 @@ typedef enum {
   UI_STATE_BLOFF,
   UI_STATE_ID3,
   UI_STATE_EOF,
-  UI_STATE_RESET,
   UI_STATE_CLEAR,
+  UI_STATE_RESET,
+  UI_STATE_ALBUM,
   UI_STATE_IDLE,
   UI_STATE_ERROR,
 } UI_State_t;
+
+///////////////////////// UI SCREEN /////////////////////////
+typedef enum {
+  UI_SCREEN_MAIN,
+  UI_SCREEN_PLAY_LIST,
+  UI_SCREEN_ALBUM_LIST,
+  UI_SCREEN_SETTING,
+} UI_Screen_t;
 
 //////////////////// SETTINGS / CONTROLL ////////////////////
 typedef struct {
@@ -128,21 +137,6 @@ void ui_set_playNo(uint32_t playNo);
 const uint32_t ui_get_playNo(void);
 const uint32_t ui_get_counts(void);
 
-//////////////// SCREEN: ui_ScreenAlbumList /////////////////
-extern lv_obj_t *ui_ScreenAlbumList;
-void ui_event_ScreenAlbumList(lv_event_t *e);
-void ui_ScreenAlbumList_screen_init  (void);
-void ui_ScreenAlbumList_screen_deinit(void);
-void ui_album_create(void *root);
-void ui_album_load  (void *root);
-
-// Debug functions
-extern __attribute__((weak)) size_t count_exposed_nodes(void);
-extern __attribute__((weak)) size_t count_album_list(void);
-extern __attribute__((weak)) void show_album_list(void);
-extern __attribute__((weak)) void dump_album_list(void);
-extern __attribute__((weak)) void dump_preorder(void);
-
 ///////////////// SCREEN: ui_ScreenPlayList /////////////////
 extern lv_obj_t *ui_ScreenPlayList;
 void ui_ScreenPlayList_screen_init  (void);
@@ -161,6 +155,21 @@ bool ui_list_get_heart_state(uint32_t track_id);
 extern __attribute__((weak)) size_t get_cell_count(void);
 extern __attribute__((weak)) void show_ui_control(void);
 extern __attribute__((weak)) void dump_play_list(void);
+
+//////////////// SCREEN: ui_ScreenAlbumList /////////////////
+extern lv_obj_t *ui_ScreenAlbumList;
+void ui_event_ScreenAlbumList(lv_event_t *e);
+void ui_ScreenAlbumList_screen_init  (void);
+void ui_ScreenAlbumList_screen_deinit(void);
+void ui_album_create(void *root, bool update);
+void ui_album_load  (void *root);
+
+// Debug functions
+extern __attribute__((weak)) size_t count_exposed_nodes(void);
+extern __attribute__((weak)) size_t count_album_list(void);
+extern __attribute__((weak)) void show_album_list(void);
+extern __attribute__((weak)) void dump_album_list(void);
+extern __attribute__((weak)) void dump_preorder(void);
 
 ///////////////// SCREEN: ui_ScreenSetting //////////////////
 extern lv_obj_t *ui_ScreenSetting;

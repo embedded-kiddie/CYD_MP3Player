@@ -4,14 +4,14 @@ MP3 music player for Cheap Yellow Display
 ## Library & Sketches
 
 ### [CYD_Audio](CYD_Audio)
-This library is derived from [hexeguitar/ESP32_TFT_PIO][1], which was created for PlatformIO.
+CYD_Audio is an [ESP32 I2S audio library][0] by [Piotr Zapart][1], written for PlatformIO.
 
-This derivative has been modified for Arduino so that it can be installed in the `libraries` folder in your Arduino sketchbook folder.
+The version included here has been modified for Arduino so that it can be installed into the `libraries` folder in your Arduino sketchbook folder.
 
 ### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
 This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.
 
-The `CYD_Audio` class creates a task called `audioplay` on ESP32 core 0. To control play, stop, volume up/down, etc., send messages to the `audioplay` task from core 1.
+The helper class `CYD_Audio` also created by [Piotr Zapart][1] simplifies the use of the CYD_Audio library. It creates a task named `audioplay` on ESP32 core 0, and allows you to control playback, volume adjustment, etc. by sending messages to the `audioplay` task from core 1.
 
 ### [CYD_MP3Player_Simple](CYD_MP3Player_Simple)
 This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Player` to scan the audio files on the SD card, create a playlist, and control the playback order.
@@ -95,7 +95,8 @@ void audioTask(void *parameter)
 ## Special Thanks
 - [hexeguitar/ESP32_TFT_PIO][1] (published under the MIT license)
 
-[1]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
+[0]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
+[1]: https://github.com/hexeguitar "hexeguitar (Piotr Zapart)"
 [2]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-amp-gain-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
 [3]: https://www.youtube.com/watch?v=6JCLHIXXVus "ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube"
 [4]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-i2s-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."

@@ -3,7 +3,7 @@
 
 LV_IMAGE_DECLARE(img_album);
 LV_IMAGE_DECLARE(Annie_Spratt);
-LV_IMAGE_DECLARE(BoliviaInteligente);
+LV_IMAGE_DECLARE(Kailun_Zhang);
 LV_IMAGE_DECLARE(David_Becke);
 LV_IMAGE_DECLARE(Doncoombez);
 LV_IMAGE_DECLARE(Dzo);
@@ -16,7 +16,7 @@ LV_IMAGE_DECLARE(Vincent_Tint);
 const lv_image_dsc_t *photos[] = {
   /*  0 */  & img_album,
   /*  1 */  & Annie_Spratt,
-  /*  2 */  & BoliviaInteligente,
+  /*  2 */  & Kailun_Zhang,
   /*  3 */  & David_Becke,
   /*  4 */  & Doncoombez,
   /*  5 */  & Dzo,

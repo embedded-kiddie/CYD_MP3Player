@@ -15,9 +15,10 @@ UI_Setting_t ui_setting = {
 
 ////////////////////// LOCAL VARIABLES //////////////////////
 #include "MP3Player.h"
-static MP3Player  player;
-static MP3Tags_t  id3tags;
-static UI_State_t nextState;
+static MP3Player    player;
+static MP3Tags_t    id3tags;
+static UI_State_t   nextState;
+static UI_Screen_t  screenFrom;
 
 //--------------------------------------------------------------------------------
 // Auto saving flag
@@ -161,7 +162,7 @@ static void update_elapsed_time(void) {
 }
 
 //--------------------------------------------------------------------------------
-// Save / Load / Reset settings in SD
+// Save / Load ui_settings to / from SD card
 //--------------------------------------------------------------------------------
 static bool save_setting(void) {
   // Save partition
@@ -189,7 +190,7 @@ static bool load_setting(void) {
   fd.read((uint8_t *)&ui_setting, sizeof(ui_setting));
   fd.close();
 
-  // Update the saved sleep timer setting
+  // Restore the setting of sleep timer
   ui_setting.selectSleepTimer = sleepTimer;
 
   // Check if the partition exists
@@ -242,14 +243,6 @@ static bool load_setting(void) {
   return true;
 }
 
-static bool reset_setting(void) {
-  // Stop playback before saving settings to avoid conflict with SD access
-  play_stop();
-  player.DeleteNodeTree();
-  player.ClearAudioFiles();
-  return save_setting();
-}
-
 //--------------------------------------------------------------------------------
 // Update data to be automatically saved when playback reaches the end of file
 //--------------------------------------------------------------------------------
@@ -298,7 +291,7 @@ static bool auto_saving(void) {
 }
 
 //--------------------------------------------------------------------------------
-// Scan SD card for audio files and create a playlist
+// Scan SD card for audio files and create a playlist / album list
 //--------------------------------------------------------------------------------
 static bool create_playlist(void) {
   // Setup UI setting
@@ -321,6 +314,21 @@ static bool create_playlist(void) {
   return false;
 }
 
+static bool reset_playlist(void) {
+  // Stop playback before saving settings to avoid conflict with SD access
+  play_stop();
+  player.DeleteNodeTree();  // delete m_tree
+  player.ClearAudioFiles(); // m_list.clear()
+  return save_setting();    // save ui_setting
+}
+
+static void reset_album(void) {
+  reset_playlist();
+  load_setting();
+  player.ScanAlbumDirs();
+  ui_album_create((void*)player.m_tree, true); // Load json data from SD card
+}
+
 //--------------------------------------------------------------------------------
 // Check if the currently playing audio file is favorite
 //--------------------------------------------------------------------------------
@@ -332,7 +340,7 @@ static bool check_favorite(void) {
 // Asynchronous function to reduce delays during screen transitions
 //--------------------------------------------------------------------------------
 static void stop_async(void *user_data) {
-  if (ui_state != UI_STATE_IDLE) {
+  if (ui_state != UI_STATE_IDLE && ui_state != UI_STATE_ALBUM) {
     ui_state = UI_STATE_STOP;
   }
 }
@@ -340,7 +348,8 @@ static void stop_async(void *user_data) {
 //--------------------------------------------------------------------------------
 // Helper function for screen transition
 //--------------------------------------------------------------------------------
-static void change_screen(lv_obj_t ** screen, lv_screen_load_anim_t fademode, void (*screen_init)(void)) {
+static void change_screen(UI_Screen_t from, lv_obj_t ** screen, lv_screen_load_anim_t fademode, void (*screen_init)(void)) {
+  screenFrom = from;
   if(*screen == NULL) {
     screen_init();
   }
@@ -357,36 +366,36 @@ void ui_event_ScreenMain(lv_event_t *e) {
   lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
 
   if (dir == LV_DIR_RIGHT) {
-    change_screen(&ui_ScreenAlbumList, LV_SCR_LOAD_ANIM_MOVE_RIGHT, &ui_ScreenAlbumList_screen_init);
+    change_screen(UI_SCREEN_MAIN, &ui_ScreenAlbumList, LV_SCR_LOAD_ANIM_MOVE_RIGHT, &ui_ScreenAlbumList_screen_init);
   }
 
   else if (dir == LV_DIR_LEFT) {
-    change_screen(&ui_ScreenPlayList, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenPlayList_screen_init);
+    change_screen(UI_SCREEN_MAIN, &ui_ScreenPlayList, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenPlayList_screen_init);
     ui_list_focus_playing(player.GetPlayNo());
   }
 
   else if (dir == LV_DIR_TOP || dir == LV_DIR_BOTTOM) {
     lv_screen_load_anim_t anim = (dir == LV_DIR_TOP ? LV_SCR_LOAD_ANIM_MOVE_TOP : LV_SCR_LOAD_ANIM_MOVE_BOTTOM);
-    change_screen(&ui_ScreenSetting, anim, &ui_ScreenSetting_screen_init);
+    change_screen(UI_SCREEN_MAIN, &ui_ScreenSetting, anim, &ui_ScreenSetting_screen_init);
   }
 }
 
 void ui_event_GoToAlbumList(lv_event_t *e) {
   DBG_ASSERT(lv_event_get_code(e) == LV_EVENT_CLICKED);
 
-  change_screen(&ui_ScreenAlbumList, LV_SCR_LOAD_ANIM_MOVE_RIGHT, &ui_ScreenAlbumList_screen_init);
+  change_screen(UI_SCREEN_MAIN, &ui_ScreenAlbumList, LV_SCR_LOAD_ANIM_MOVE_RIGHT, &ui_ScreenAlbumList_screen_init);
 }
 
 void ui_event_GoToPlayList(lv_event_t *e) {
   DBG_ASSERT(lv_event_get_code(e) == LV_EVENT_CLICKED);
 
-  change_screen(&ui_ScreenPlayList, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenPlayList_screen_init);
+  change_screen(UI_SCREEN_MAIN, &ui_ScreenPlayList, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenPlayList_screen_init);
 }
 
 void ui_event_GoToSettings(lv_event_t *e) {
   DBG_ASSERT(lv_event_get_code(e) == LV_EVENT_CLICKED);
 
-  change_screen(&ui_ScreenSetting, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, &ui_ScreenSetting_screen_init);
+  change_screen(UI_SCREEN_MAIN, &ui_ScreenSetting, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, &ui_ScreenSetting_screen_init);
 }
 
 void ui_event_Favorite(lv_event_t *e) {
@@ -487,47 +496,6 @@ void ui_event_ElapsedBar(lv_event_t *e) {
 }
 
 //********************************************************************************
-// SCREEN: ui_ScreenAlbumList event handlers
-//********************************************************************************
-void ui_event_ScreenAlbumList(lv_event_t *e) {
-  lv_event_code_t event_code = lv_event_get_code(e);
-  DBG_ASSERT(
-    event_code == LV_EVENT_CLICKED ||
-    event_code == LV_EVENT_GESTURE ||
-    event_code == LV_EVENT_SCREEN_LOADED ||
-    event_code == LV_EVENT_SCREEN_UNLOADED
-  );
-
-  if (event_code == LV_EVENT_CLICKED) {
-    change_screen(&ui_ScreenMain, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenMain_screen_init);
-  }
-
-  else if (event_code == LV_EVENT_GESTURE) {
-    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
-    if (dir == LV_DIR_RIGHT || dir == LV_DIR_LEFT) {
-      lv_screen_load_anim_t anim = (dir == LV_DIR_RIGHT ? LV_SCR_LOAD_ANIM_MOVE_RIGHT : LV_SCR_LOAD_ANIM_MOVE_LEFT);
-      change_screen(&ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
-    }
-  }
-
-  else if (event_code == LV_EVENT_SCREEN_LOADED) {
-    // Increase free memory
-    // lv_fs_clear_cache(); // sdfs.{h|cpp}
-
-    // Create album list (No need to access SD card)
-    ui_album_create((void*)player.m_tree);
-
-    // Stop playback to avoid conflict with SD access (async required)
-    lv_async_call(stop_async, NULL);
-  }
-
-  else if (event_code == LV_EVENT_SCREEN_UNLOADED) {
-    ui_ScreenAlbumList_screen_deinit();
-    ui_state = UI_STATE_CLEAR;
-  }
-}
-
-//********************************************************************************
 // SCREEN: ui_ScreenPlayList event handlers
 //********************************************************************************
 void ui_event_ScreenPlayList(lv_event_t *e) {
@@ -540,7 +508,7 @@ void ui_event_ScreenPlayList(lv_event_t *e) {
   if (event_code == LV_EVENT_GESTURE) {
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
     lv_screen_load_anim_t anim = dir == LV_DIR_RIGHT ? LV_SCR_LOAD_ANIM_MOVE_RIGHT : LV_SCR_LOAD_ANIM_MOVE_LEFT;
-    change_screen(&ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
+    change_screen(UI_SCREEN_PLAY_LIST, &ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
   }
 
   else if (event_code == LV_EVENT_SCREEN_UNLOADED) {
@@ -572,6 +540,55 @@ void ui_event_PlayList_Heart(lv_event_t *e) {
 }
 
 //********************************************************************************
+// SCREEN: ui_ScreenAlbumList event handlers
+//********************************************************************************
+void ui_event_ScreenAlbumList(lv_event_t *e) {
+  lv_event_code_t event_code = lv_event_get_code(e);
+  DBG_ASSERT(
+    event_code == LV_EVENT_CLICKED ||
+    event_code == LV_EVENT_GESTURE ||
+    event_code == LV_EVENT_SCREEN_LOADED ||
+    event_code == LV_EVENT_SCREEN_UNLOADED
+  );
+
+  if (event_code == LV_EVENT_CLICKED) {
+    if (lv_event_get_user_data(e)) {
+      change_screen(UI_SCREEN_ALBUM_LIST, &ui_ScreenSetting, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, &ui_ScreenSetting_screen_init);
+    } else {
+      change_screen(UI_SCREEN_ALBUM_LIST, &ui_ScreenMain, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenMain_screen_init);
+    }
+  }
+
+  else if (event_code == LV_EVENT_GESTURE) {
+    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+    if (dir == LV_DIR_RIGHT || dir == LV_DIR_LEFT) {
+      lv_screen_load_anim_t anim = (dir == LV_DIR_RIGHT ? LV_SCR_LOAD_ANIM_MOVE_RIGHT : LV_SCR_LOAD_ANIM_MOVE_LEFT);
+      change_screen(UI_SCREEN_ALBUM_LIST, &ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
+    }
+    else if (dir == LV_DIR_TOP || dir == LV_DIR_BOTTOM) {
+      lv_screen_load_anim_t anim = (dir == LV_DIR_TOP ? LV_SCR_LOAD_ANIM_MOVE_TOP : LV_SCR_LOAD_ANIM_MOVE_BOTTOM);
+      change_screen(UI_SCREEN_ALBUM_LIST, &ui_ScreenSetting, anim, &ui_ScreenSetting_screen_init);
+    }
+  }
+
+  else if (event_code == LV_EVENT_SCREEN_LOADED) {
+    // Increase free memory
+    // lv_fs_clear_cache(); // sdfs.{h|cpp}
+
+    // Create the album list (No need to access SD card)
+    ui_album_create((void*)player.m_tree, false);
+
+    // Stop playback to avoid conflict with SD access (async required)
+    lv_async_call(stop_async, NULL);
+  }
+
+  else if (event_code == LV_EVENT_SCREEN_UNLOADED) {
+    ui_ScreenAlbumList_screen_deinit();
+    ui_state = UI_STATE_CLEAR;
+  }
+}
+
+//********************************************************************************
 // SCREEN: ui_ScreenSetting event handlers
 //********************************************************************************
 void ui_event_ScreenSetting(lv_event_t *e) {
@@ -579,17 +596,32 @@ void ui_event_ScreenSetting(lv_event_t *e) {
   DBG_ASSERT(
     event_code == LV_EVENT_CLICKED ||
     event_code == LV_EVENT_GESTURE ||
+    event_code == LV_EVENT_SCREEN_LOADED ||
     event_code == LV_EVENT_SCREEN_UNLOADED
   );
 
   if (event_code == LV_EVENT_CLICKED) {
-    change_screen(&ui_ScreenMain, LV_SCR_LOAD_ANIM_MOVE_TOP, &ui_ScreenMain_screen_init);
+    if (screenFrom == UI_SCREEN_MAIN) {
+      change_screen(UI_SCREEN_SETTING, &ui_ScreenMain, LV_SCR_LOAD_ANIM_MOVE_TOP, &ui_ScreenMain_screen_init);
+    } else if (screenFrom == UI_SCREEN_ALBUM_LIST) {
+      change_screen(UI_SCREEN_SETTING, &ui_ScreenAlbumList, LV_SCR_LOAD_ANIM_MOVE_TOP, &ui_ScreenAlbumList_screen_init);
+    }
   }
 
   else if (event_code == LV_EVENT_GESTURE) {
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
     lv_screen_load_anim_t anim = (dir == LV_DIR_TOP ? LV_SCR_LOAD_ANIM_MOVE_TOP : LV_SCR_LOAD_ANIM_MOVE_BOTTOM);
-    change_screen(&ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
+    if (screenFrom == UI_SCREEN_MAIN) {
+      change_screen(UI_SCREEN_SETTING, &ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
+    } else if (screenFrom == UI_SCREEN_ALBUM_LIST) {
+      change_screen(UI_SCREEN_SETTING, &ui_ScreenAlbumList, anim, &ui_ScreenAlbumList_screen_init);
+    }
+  }
+
+  else if (event_code == LV_EVENT_SCREEN_LOADED) {
+    if (screenFrom == UI_SCREEN_ALBUM_LIST) {
+      lv_async_call(stop_async, NULL);
+    }
   }
 
   else if (event_code == LV_EVENT_SCREEN_UNLOADED) {
@@ -601,8 +633,18 @@ void ui_event_ScreenSetting(lv_event_t *e) {
       if (ui_setting.partition_id != partition_id) {
         ui_setting.partition_id = partition_id;
 
-        // Stop playback before saving settings
-        ui_state = UI_STATE_RESET;
+        // Change the procedure depending on the screen
+        lv_obj_t *screen = lv_screen_active();
+
+        if (screen == ui_ScreenMain) {
+          // Reset and create a new playlist
+          ui_state = UI_STATE_RESET;
+        }
+
+        else if (screen == ui_ScreenAlbumList) {
+          // Reset and create a new album list
+          ui_state = UI_STATE_ALBUM;
+        }
       }
     }
   }
@@ -783,13 +825,17 @@ UI_State_t ui_loop(void) {
     case UI_STATE_EOF:
       ui_state = auto_saving() ? nextState : UI_STATE_ERROR;
       break;
-    case UI_STATE_RESET:
-      ui_state = reset_setting() ? UI_STATE_START : UI_STATE_ERROR;
-      break;
     case UI_STATE_CLEAR:
       play_stop();
       player.ClearAudioFiles();
       ui_state = UI_STATE_START;
+      break;
+    case UI_STATE_RESET:
+      ui_state = reset_playlist() ? UI_STATE_START : UI_STATE_ERROR;
+      break;
+    case UI_STATE_ALBUM:
+      reset_album();
+      ui_state = UI_STATE_IDLE;
       break;
     case UI_STATE_ERROR:
       lv_label_set_text_fmt(ui_MusicTitle, "%s %s", LV_SYMBOL_WARNING, player.GetError());

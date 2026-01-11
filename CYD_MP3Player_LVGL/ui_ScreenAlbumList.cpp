@@ -9,7 +9,7 @@
 #include <functional> // std::hash
 
 /////////////// Album list configuration file ///////////////
-#define ALBUM_LIST_PATH ALBUM_CONF_PATH ALBUM_LIST_FILE
+#define ALBUM_LIST_CONF ALBUM_LIST_PATH ALBUM_LIST_FILE
 
 //--------------------------------------------------------------------------------
 // Instance of the screen widget
@@ -57,8 +57,10 @@ lv_obj_t *ui_ScreenAlbumList;
 
 #define ALBUM_LIST_X        LV_PCT_X(5)     // List Container
 #define ALBUM_LIST_Y        LV_PCT_Y(24)    // List Container
-#define BACK_TO_MAIN_X      LV_PCT_X(87)    // Back to Main
-#define BACK_TO_MAIN_Y      LV_PCT_Y(4)     // Back to Main
+#define MOVE_TO_UP_X        LV_PCT_X(87)    // Move to Main
+#define MOVE_TO_UP_Y        LV_PCT_Y(4)     // Move to Main
+#define MOVE_TO_RIGHT_X     LV_PCT_X(87)    // Move to Setting
+#define MOVE_TO_RIGHT_Y     LV_PCT_Y(14)+3  // Move to Setting
 
 typedef struct {
   String    name; // name in dropdown list
@@ -622,7 +624,7 @@ static inline String make_json_list(void) {
 }
 
 static inline String make_json_path(int id) {
-  return String(album_control.root->name.c_str()) + ALBUM_CONF_PATH + String(id) + ALBUM_LIST_JSON;
+  return String(album_control.root->name.c_str()) + ALBUM_LIST_PATH + String(id) + ALBUM_LIST_JSON;
 }
 
 static bool album_json_save(void) {
@@ -649,6 +651,7 @@ static bool album_json_save(void) {
 }
 
 static bool album_json_load(void) {
+  // Count "All"
   if (album_control.list_id == 0) {
     AlbumInfo_t info = get_album_info();
     return info.n_selected ? true : false;
@@ -673,7 +676,7 @@ static bool album_json_load(void) {
 }
 
 static bool album_list_save(void) {
-  std::string path = album_control.root->name + ALBUM_CONF_PATH;
+  std::string path = album_control.root->name + ALBUM_LIST_PATH;
   if (!SD.exists(path.c_str())) {
     SD.mkdir(path.c_str());
   }
@@ -693,17 +696,20 @@ static bool album_list_save(void) {
 }
 
 static void album_list_load(void) {
-  String buf = (album_control.root->name + ALBUM_LIST_PATH).c_str();
+  String buf = (album_control.root->name + ALBUM_LIST_CONF).c_str();
   File fd = SD.open(buf.c_str(), FILE_READ);
 
   // Read data from an existing file
   if (fd) {
-    album_control.list.clear();
+    // Read 1st line: Set current list ID
     album_control.list_id = fd.readStringUntil('\n').toInt();
+
+    // Read following lines: Create an array of name/hash pairs
+    album_control.list.clear();
     while (fd.available()) {
       buf = fd.readStringUntil('\n');
       int index = buf.indexOf('\t');
-      if (index > 0) {
+      if (index > 0) { // Exclude "All"
         album_control.list.push_back({
           /* .name = */ buf.substring(0, index++),
           /* .hash = */ (size_t)strtoul(buf.substring(index).c_str(), NULL, 10)
@@ -1201,16 +1207,22 @@ void ui_ScreenAlbumList_screen_init(void) {
   lv_obj_add_event_cb(keypad_buttons,     delete_cb, LV_EVENT_DELETE, reinterpret_cast<void*>(&keypad_buttons)    );
 
 #if SHOW_ARROW_BUTTON || true
-  //////////////////// Back to Main ////////////////////
-  static constexpr lv_style_const_prop_t style_prop_common[] = {
+  //////////////// Move to Main/Setting ////////////////
+  static constexpr lv_style_const_prop_t style_prop_U[] = {
     LV_STYLE_CONST_WIDTH(27),
     LV_STYLE_CONST_HEIGHT(27),
-    LV_STYLE_CONST_X(BACK_TO_MAIN_X),
-    LV_STYLE_CONST_Y(BACK_TO_MAIN_Y),
+    LV_STYLE_CONST_X(MOVE_TO_UP_X),
+    LV_STYLE_CONST_Y(MOVE_TO_UP_Y),
+    LV_STYLE_CONST_PROPS_END
+  };
+  static constexpr lv_style_const_prop_t style_prop_R[] = {
+    LV_STYLE_CONST_WIDTH(27),
+    LV_STYLE_CONST_HEIGHT(27),
+    LV_STYLE_CONST_X(MOVE_TO_RIGHT_X),
+    LV_STYLE_CONST_Y(MOVE_TO_RIGHT_Y),
     LV_STYLE_CONST_PROPS_END
   };
   static constexpr lv_style_const_prop_t style_prop_default[] = {
-    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_right),
     LV_STYLE_CONST_BG_COLOR(UI_COLOR_BACKGROUND),
     LV_STYLE_CONST_RADIUS(LV_RADIUS_CIRCLE),
     LV_STYLE_CONST_BORDER_WIDTH(0),
@@ -1220,28 +1232,55 @@ void ui_ScreenAlbumList_screen_init(void) {
     LV_STYLE_CONST_PAD_LEFT(8),
     LV_STYLE_CONST_PROPS_END
   };
+  static constexpr lv_style_const_prop_t style_prop_default_U[] = {
+    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_up),
+    LV_STYLE_CONST_PROPS_END
+  };
+  static constexpr lv_style_const_prop_t style_prop_default_R[] = {
+    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_right),
+    LV_STYLE_CONST_PROPS_END
+  };
+  static constexpr lv_style_const_prop_t style_prop_checked_U[] = {
+    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_up),
+    LV_STYLE_CONST_BG_COLOR(UI_COLOR_BACKGROUND),
+    LV_STYLE_CONST_PROPS_END
+  };
+  static constexpr lv_style_const_prop_t style_prop_checked_R[] = {
+    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_right),
+    LV_STYLE_CONST_BG_COLOR(UI_COLOR_BACKGROUND),
+    LV_STYLE_CONST_PROPS_END
+  };
   static constexpr lv_style_const_prop_t style_prop_pressed[] = {
     LV_STYLE_CONST_PAD_TOP(10),
     LV_STYLE_CONST_PAD_LEFT(10),
     LV_STYLE_CONST_PROPS_END
   };
-  static constexpr lv_style_const_prop_t style_prop_checked[] = {
-    LV_STYLE_CONST_BG_IMAGE_SRC(&img_menu_right),
-    LV_STYLE_CONST_BG_COLOR(UI_COLOR_BACKGROUND),
-    LV_STYLE_CONST_PROPS_END
-  };
-  static LV_STYLE_CONST_INIT(style_common,  (void*)(style_prop_common ));
-  static LV_STYLE_CONST_INIT(style_default, (void*)(style_prop_default));
-  static LV_STYLE_CONST_INIT(style_pressed, (void*)(style_prop_pressed));
-  static LV_STYLE_CONST_INIT(style_checked, (void*)(style_prop_checked));
+  static LV_STYLE_CONST_INIT(style_U,         (void*)style_prop_U        );
+  static LV_STYLE_CONST_INIT(style_R,         (void*)style_prop_R        );
+  static LV_STYLE_CONST_INIT(style_default,   (void*)style_prop_default  );
+  static LV_STYLE_CONST_INIT(style_default_U, (void*)style_prop_default_U);
+  static LV_STYLE_CONST_INIT(style_default_R, (void*)style_prop_default_R);
+  static LV_STYLE_CONST_INIT(style_checked_U, (void*)style_prop_checked_U);
+  static LV_STYLE_CONST_INIT(style_checked_R, (void*)style_prop_checked_R);
+  static LV_STYLE_CONST_INIT(style_pressed,   (void*)style_prop_pressed  );
 
   obj = lv_checkbox_create(ui_ScreenAlbumList);
   lv_checkbox_set_text_static(obj, "");
-  lv_obj_add_style    (obj, &style_common,  (uint32_t)LV_PART_MAIN      | (uint32_t)LV_STATE_DEFAULT);
-  lv_obj_add_style    (obj, &style_default, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
-  lv_obj_add_style    (obj, &style_pressed, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_PRESSED);
-  lv_obj_add_style    (obj, &style_checked, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_CHECKED);
-  lv_obj_add_event_cb (obj, ui_event_ScreenAlbumList, LV_EVENT_CLICKED, NULL);
+  lv_obj_add_style    (obj, &style_U,         (uint32_t)LV_PART_MAIN      | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_default,   (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_default_U, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_checked_U, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_CHECKED);
+  lv_obj_add_style    (obj, &style_pressed,   (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_PRESSED);
+  lv_obj_add_event_cb (obj, ui_event_ScreenAlbumList, LV_EVENT_CLICKED, (void*)true);
+
+  obj = lv_checkbox_create(ui_ScreenAlbumList);
+  lv_checkbox_set_text_static(obj, "");
+  lv_obj_add_style    (obj, &style_R,         (uint32_t)LV_PART_MAIN      | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_default,   (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_default_R, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
+  lv_obj_add_style    (obj, &style_checked_R, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_CHECKED);
+  lv_obj_add_style    (obj, &style_pressed,   (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_PRESSED);
+  lv_obj_add_event_cb (obj, ui_event_ScreenAlbumList, LV_EVENT_CLICKED, (void*)false);
 #endif // SHOW_ARROW_BUTTON
 }
 
@@ -1258,14 +1297,21 @@ void ui_ScreenAlbumList_screen_deinit(void) {
 }
 
 //--------------------------------------------------------------------------------
-// Create selectable album list widgets
+// Create album list widgets
 //--------------------------------------------------------------------------------
-void ui_album_create(void *root) {
+void ui_album_create(void *root, bool update) {
   if (root) {
     // Re-traverse node tree by preorder and initialize album list
     album_control.root = reinterpret_cast<Node*>(root);
     album_control.n_nodes = album_control.root->traverse_preorder();
     album_list_refresh(); // Initialize album list widgets
+
+    // Load json data and update album list and dropdown
+    if (update) {
+      album_list_load(); // Load album list data
+      lv_dropdown_set_options (dropdown_list, make_json_list().c_str());
+      lv_dropdown_set_selected(dropdown_list, album_control.list_id);
+    }
   } else {
     // In case the SD card is not inserted
     memset((void*)&album_control, 0, sizeof(album_control));
@@ -1273,7 +1319,7 @@ void ui_album_create(void *root) {
 }
 
 //--------------------------------------------------------------------------------
-// Load album list data
+// Load album list data in preparation for scanning audio files
 //--------------------------------------------------------------------------------
 void ui_album_load(void *root) {
   if (root) {

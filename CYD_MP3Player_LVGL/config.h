@@ -68,7 +68,7 @@
 // The list to classify albums is saved under "PARTITION_PATH" as a text file.
 // Also the configuration for each classification is saved as a JSON file.
 //--------------------------------------------------------------------------------
-#define ALBUM_CONF_PATH   "@album/"       // Album list configuration folder
+#define ALBUM_LIST_PATH   "@album/"       // Album list configuration folder
 #define ALBUM_LIST_FILE   "@list.txt"     // Album list configuration file
 #define ALBUM_LIST_JSON   ".json"         // Album list JSON file extension
 

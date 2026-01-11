@@ -107,6 +107,7 @@ void ui_ScreenSetting_screen_init(void) {
     ui_ScreenSetting = lv_obj_create(NULL);
     lv_obj_set_style_bg_color (ui_ScreenSetting, UI_COLOR_BACKGROUND, 0);
     lv_obj_add_event_cb       (ui_ScreenSetting, ui_event_ScreenSetting, LV_EVENT_GESTURE, NULL);
+    lv_obj_add_event_cb       (ui_ScreenSetting, ui_event_ScreenSetting, LV_EVENT_SCREEN_LOADED, NULL);
     lv_obj_add_event_cb       (ui_ScreenSetting, ui_event_ScreenSetting, LV_EVENT_SCREEN_UNLOADED, (void*)&partition_id);
     lv_obj_add_event_cb       (ui_ScreenSetting, delete_cb, LV_EVENT_DELETE, (void*)&ui_ScreenSetting);
 
