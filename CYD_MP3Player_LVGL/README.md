@@ -17,7 +17,7 @@
 <details>
 <summary>Screen transition</summary>
 
-![CYD-MP3Player - Screens](assets/CYD-MP3Player-Screens.png)
+![CYD-MP3Player - Screens](assets/CYD-MP3Player-Screens.jpg)
 </details>
 
 - **Screen: Main**  

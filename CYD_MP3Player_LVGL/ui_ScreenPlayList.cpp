@@ -1,6 +1,8 @@
 //================================================================================
 // MP3 Music Player for CYD - Playist Screen
-// LVGL version: 9.2.2 and up
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
+//  Released under the MIT license (https://opensource.org/license/mit)
+//  LVGL version: 9.2.2 and up
 //================================================================================
 #include "ui.h"
 

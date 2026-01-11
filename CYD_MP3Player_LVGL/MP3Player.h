@@ -1,5 +1,7 @@
 //================================================================================
 // MP3Player class definition
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
+//  Released under the MIT license (https://opensource.org/license/mit)
 //================================================================================
 #ifndef _MP3PLAYER_H_
 #define _MP3PLAYER_H_

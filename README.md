@@ -93,7 +93,7 @@ void audioTask(void *parameter)
 ```
 
 ## Special Thanks
-- [hexeguitar/ESP32_TFT_PIO][1] (published under the MIT license)
+- [ESP32 I2S audio library][0] by [hexeguitar/ESP32_TFT_PIO][6] (MIT license).
 
 [0]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
 [1]: https://github.com/hexeguitar "hexeguitar (Piotr Zapart)"
@@ -101,3 +101,4 @@ void audioTask(void *parameter)
 [3]: https://www.youtube.com/watch?v=6JCLHIXXVus "ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube"
 [4]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-i2s-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
 [5]: https://macsbug.wordpress.com/2025/04/18/cyds-note-2025/ "CYD&#8217;s Note 2025 | macsbug"
+[6]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."

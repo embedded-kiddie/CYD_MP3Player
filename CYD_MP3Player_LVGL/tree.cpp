@@ -1,7 +1,9 @@
 //================================================================================
 // N-ary Tree for directory tree
-// https://www.geeksforgeeks.org/dsa/tree-data-structure/
-// https://www.geeksforgeeks.org/dsa/generic-treesn-array-trees/
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
+//  Released under the MIT license (https://opensource.org/license/mit)
+//  https://www.geeksforgeeks.org/dsa/tree-data-structure/
+//  https://www.geeksforgeeks.org/dsa/generic-treesn-array-trees/
 //================================================================================
 #include "tree.hpp"
 

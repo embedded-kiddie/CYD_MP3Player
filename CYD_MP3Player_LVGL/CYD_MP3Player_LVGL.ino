@@ -1,5 +1,7 @@
 //================================================================================
 // MP3 Music Player for CYD using LVGL
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
+//  Released under the MIT license (https://opensource.org/license/mit)
 //
 // # README FIRST
 //  ## Software Requirement
