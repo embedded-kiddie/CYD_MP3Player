@@ -11,10 +11,10 @@ The version included here has been modified for Arduino so that it can be instal
 ### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
 This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.
 
-The helper class `CYD_Audio` also created by [Piotr Zapart][1] simplifies the use of the CYD_Audio library. It creates a task named `audioplay` on ESP32 core 0, and allows you to control playback, volume adjustment, etc. by sending messages to the `audioplay` task from core 1.
+This example creates a task named `audioplay` on core 0 with a predefined set of commands, and allows core 1 to send messages to it to control playback, volume adjustment, etc.
 
 ### [CYD_MP3Player_Simple](CYD_MP3Player_Simple)
-This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Player` to scan the audio files on the SD card, create a playlist, and control the playback order.
+This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Player` to scan the audio files on the SD card, create a playlist, and control continuous playback in a set order.
 
 ### [CYD_MP3Player_LVGL](CYD_MP3Player_LVGL)
 This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
