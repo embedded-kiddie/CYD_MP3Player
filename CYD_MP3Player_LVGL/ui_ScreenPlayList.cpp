@@ -337,17 +337,29 @@ static void delete_cb(lv_event_t *e) {
 //--------------------------------------------------------------------------------
 static void create_init_cells(void) {
   #define MIN(a, b) ((a) < (b) ? (a) : (b))
-  int i = ui_control.top;
-  int n = ui_get_counts();
-  n = ui_control.top + MIN(n, CELL_VISIBLE_MAX + CELL_VISIBLE_SPARE);
-  while (i < n) {
-    add_list_cell(play_list, i++);
-  }
-  ui_control.end = i - 1;
+  int top = ui_control.top;
+  int end = ui_get_counts() - 1;
 
-  update_slider(play_list);
-  ui_list_update_cell(ui_control.focusNo, true);
-  ui_list_update_icon(ui_control.playNo,  true);
+  // Adjust top/end
+  if (top + CELL_VISIBLE_MAX + CELL_VISIBLE_SPARE < end) {
+    end = top + CELL_VISIBLE_MAX + CELL_VISIBLE_SPARE - 1;
+  } else {
+    if ((top = end - CELL_VISIBLE_MAX) < 0) {
+      top = 0;
+    }
+  }
+
+  // Update top/end
+  ui_control.top = top;
+  ui_control.end = end;
+
+  while (top <= end) {
+    add_list_cell(play_list, top++);
+  }
+
+  update_slider(play_list); // update scroll bar
+  ui_list_update_cell  (ui_control.focusNo, true);
+  ui_list_update_icon  (ui_control.playNo,  true);
 }
 
 ////////////////////// GLOBAL FUNCTIONS /////////////////////
