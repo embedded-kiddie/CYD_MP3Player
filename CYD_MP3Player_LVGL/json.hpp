@@ -1,3 +1,8 @@
+//================================================================================
+// JSON and N-ary Tree conversion
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
+//  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
+//================================================================================
 #include <ArduinoJson.h>
 #include "tree.hpp"
 

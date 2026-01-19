@@ -1,7 +1,7 @@
 //================================================================================
 // MP3Player Configration
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
-//  Released under the MIT license (https://opensource.org/license/mit)
+//  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
