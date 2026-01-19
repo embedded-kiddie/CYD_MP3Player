@@ -6,7 +6,9 @@ MP3 music player for Cheap Yellow Display
 ### [CYD_Audio](CYD_Audio)
 CYD_Audio is an [ESP32 I2S audio library][0] by [Piotr Zapart][1], written for PlatformIO.
 
-The version included here has been modified for Arduino so that it can be installed into the `libraries` folder in your Arduino sketchbook folder.
+CYD28_audio.[ch] defines helper functions for creating an instance of the CYD_Audio class on Core 1, making it easy to create a GUI loop that runs on Core 0.
+
+The version included here has been modified for Arduino IDE so that it can be installed into the `libraries` folder in your Arduino sketchbook folder.
 
 ### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
 This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.

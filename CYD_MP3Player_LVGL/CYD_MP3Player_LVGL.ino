@@ -11,7 +11,7 @@
 //    - Select "ESP32 Dev Module" as a board package
 //    - In the "Tools" menu, select the following:
 //      - Partition Scheme: "Huge APP (3MB No OTA/1MB SPIFFS)"
-//      - Upload Speed: "460800"
+//      - Upload Speed: "460800" (mac) or "921600" (win)
 //
 //  2. Required 3rd party libraries
 //    - LVGL by kisvegabor (version: 9.2.2 and up)

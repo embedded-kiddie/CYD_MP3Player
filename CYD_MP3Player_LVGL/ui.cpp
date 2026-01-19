@@ -267,8 +267,16 @@ static bool auto_saving(void) {
 
     // Update all favorites that have been modified during playback
     if (autoSaving & SAVE_FAVORITE) {
+      // Prevent assert() from being fired by node reordering
+      lv_obj_t *screen = lv_screen_active();
+      if (screen == ui_ScreenAlbumList) {
+        player.m_tree->traverse_node();
+      }
       if (player.UpdateMetaData()) {
         autoSaving ^= SAVE_FAVORITE;
+      }
+      if (screen == ui_ScreenAlbumList) {
+        player.m_tree->traverse_preorder();
       }
     }
 
