@@ -1662,7 +1662,7 @@ static const int8_t negMask[3] = {~0x03, ~0x07, ~0x0f};
 #else
     // ESP32, PSRAM is too slow, prefer SRAM
     #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM)
+        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL/*MALLOC_CAP_SPIRAM*/)
 #endif
 
 bool AACDecoder_AllocateBuffers(void){

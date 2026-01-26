@@ -15,7 +15,7 @@
 //
 //  2. Required 3rd party libraries
 //    - LVGL by kisvegabor (version: 9.2.2 and up)
-//    - LovyanGFX by lovyan03 (version 1.2.7)
+//    - LovyanGFX by lovyan03 (version 1.2.7 and up)
 //    - SdFat by Bill Greiman (version 2.3.0)
 //    - ArduinoJson by Benoit Blanchon (version 7.4.2)
 //
@@ -249,7 +249,7 @@ static uint32_t my_tick(void) {
 }
 
 void setup() {
-#if (!USE_CALIBRATED) || (DEBUG & 2)
+#if (!USE_CALIBRATED) || (DEBUG_AUDIO) || (DEBUG & 2)
   Serial.begin(115200);
   delay(1000);
 #endif

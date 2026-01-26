@@ -25,9 +25,9 @@
 #include "alloca.h"
 
 #define __malloc_heap_psram(size) \
-    heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT | MALLOC_CAP_SPIRAM, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL)
+    heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL/*MALLOC_CAP_SPIRAM*/, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL)
 #define __calloc_heap_psram(ch, size) \
-    heap_caps_calloc_prefer(ch, size, 2, MALLOC_CAP_DEFAULT | MALLOC_CAP_SPIRAM, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL)
+    heap_caps_calloc_prefer(ch, size, 2, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL/*MALLOC_CAP_SPIRAM*/, MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL)
 
 
 // global vars

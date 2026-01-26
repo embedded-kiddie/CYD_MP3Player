@@ -44,7 +44,7 @@ boolean         s_f_newSt = false;
 
 // prefer PSRAM
 #define __malloc_heap_psram(size) \
-    heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL)
+    heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL/*MALLOC_CAP_SPIRAM*/, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL)
 
 bool FLACDecoder_AllocateBuffers(void){
 

@@ -137,16 +137,26 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
 
 ## 6. Known Issues
 
-- Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.
+- **The Arduino IDE may freeze or reset during compilation with ESP32 core 2.0.17** (probably due to the issue [IDE Crash on Failed Compile #2691][17]).  
+  - In case it freezes, try killing all IDE-related processes and restarting the IDE.
+  - In case it resets, try quitting and restarting the IDE.
+  
+  You can kill all the IDE related processes by the following command in the Terminal APP on Mac.
+  
+  ```bash
+  ps -axc｜grep -i arduino｜awk '{print $1}'｜xargs -I@ kill -9 @
+  ```
 
-```c++
-/Users/xxxx/Documents/Arduino/libraries/SdFat/src/FsLib/FsNew.h:44:48: warning: optimization attribute on 'void* operator new(size_t, newalign_t*)' follows definition but the attribute doesn't match [-Wattributes]
- void* operator new(size_t size, newalign_t* ptr);
-                                                ^
-/Users/xxxx/Library/Arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/xtensa-esp32-elf/include/c++/8.4.0/new:168:14: note: previous definition of 'void* operator new(std::size_t, void*)' was here
- inline void* operator new(std::size_t, void* __p) _GLIBCXX_USE_NOEXCEPT
-              ^~~~~~~~
-```
+- Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.
+  
+  ```c++
+  /Users/xxxx/Documents/Arduino/libraries/SdFat/src/FsLib/FsNew.h:44:48: warning: optimization attribute on 'void* operator new(size_t, newalign_t*)' follows definition but the attribute doesn't match [-Wattributes]
+  void* operator new(size_t size, newalign_t* ptr);
+                                                  ^
+  /Users/xxxx/Library/Arduino15/packages/esp32/tools/xtensa-esp32-elf-gcc/esp-2021r2-patch5-8.4.0/xtensa-esp32-elf/include/c++/8.4.0/new:168:14: note: previous definition of 'void* operator new(std::size_t, void*)' was here
+  inline void* operator new(std::size_t, void* __p) _GLIBCXX_USE_NOEXCEPT
+               ^~~~~~~~
+  ```
 
 - When using the built-in DAC and amplifier, there will be a "click" sound when powering up and when pausing/resume playback.
 
@@ -199,3 +209,4 @@ If you find any issues or have suggestions, please report in [Issues][12] or [Di
 [14]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
 [15]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
 [16]: https://unsplash.com/license "License｜Unsplash"
+[17]: https://github.com/arduino/arduino-ide/issues/2691 "IDE Crash on Failed Compile · Issue #2691 · arduino/arduino-ide"

@@ -1535,7 +1535,7 @@ void MP3Decoder_ClearBuffer(void) {
 #else
     // ESP32, PSRAM is too slow, prefer SRAM
     #define __malloc_heap_psram(size) \
-        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_SPIRAM)
+        heap_caps_malloc_prefer(size, 2, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL, MALLOC_CAP_DEFAULT|MALLOC_CAP_INTERNAL/*MALLOC_CAP_SPIRAM*/)
 #endif
 
 bool MP3Decoder_AllocateBuffers(void) {

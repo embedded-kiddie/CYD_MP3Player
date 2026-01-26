@@ -48,12 +48,12 @@ typedef struct {
 class Node {
 private:
   static bool m_found;          // node search flag
+  static uint16_t n_depth;      // depth of tree
+  static uint16_t n_nodes;      // number of all nodes
+  static uint16_t n_leafs;      // number of leaf nodes
+  static uint16_t n_audio;      // number of files under the leaf nodes
   static Node *m_found_node;    // node search result
   static std::string m_path;    // file path search result
-  static uint32_t n_depth;      // depth of tree
-  static uint32_t n_nodes;      // number of all nodes
-  static uint32_t n_leafs;      // number of leaf nodes
-  static uint32_t n_audio;      // number of files under the leaf nodes
 public:
   uint16_t key;                 // a key assigned to each node
   uint16_t n_files;             // number of audio files
@@ -175,7 +175,7 @@ private:
   //  0   1   2   3   5       8
   //                ┌─┴─┐  ┌──┼──┐
   //                4   5  6  7  8
-  uint32_t traverse_node(Node *node, uint32_t depth = 1) {
+  uint32_t traverse_node(Node *node, uint16_t depth = 1) {
     for (auto &n : node->children) {
       if (n->meta.depth == 0) {
         n->meta.depth   = depth;
@@ -184,7 +184,7 @@ private:
       }
 
       if (n->children.size()) {
-        uint32_t d = traverse_node(n, depth + 1);
+        uint16_t d = traverse_node(n, depth + 1);
         n_depth = max(n_depth, d);
         n->meta.type = TYPE_NODE;
       } else {
@@ -206,7 +206,7 @@ private:
   //  1   2   4   5   7       10
   //                ┌─┴─┐  ┌──┼──┐
   //                8   9  11 12 13
-  void traverse_preorder(Node *node, uint32_t depth) {
+  void traverse_preorder(Node *node, uint16_t depth) {
     for (auto &n : node->children) {
       n->key = n_nodes++;
       traverse_preorder(n, depth + 1);

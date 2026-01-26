@@ -46,7 +46,7 @@ bool MP3Player::begin(const char *root, uint8_t volume) {
 // Scan the SD card and create an album list (i.e. a node tree)
 //--------------------------------------------------------------------------------
 uint32_t MP3Player::ScanAlbumDirs(void) {
-  uint32_t time;
+  //uint32_t time;
   DBG_EXEC({
     printf("%s: Free heap %7lu bytesm / Minimum heap %7lu bytes\n", __func__,
       heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
@@ -80,7 +80,7 @@ uint32_t MP3Player::ScanAlbumDirs(void) {
 //--------------------------------------------------------------------------------
 uint32_t MP3Player::ScanAudioFiles(uint8_t partition, bool shuffle) {
   DBG_ASSERT(m_tree && m_list.size() == 0);
-  uint32_t time;
+  //uint32_t time;
   DBG_EXEC({
     printf("%s: Free heap %7lu bytesm / Minimum heap %7lu bytes\n", __func__,
       heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
@@ -385,7 +385,7 @@ bool MP3Player::FilePlay(const char* path) {
   if (audioConnecttoSD(path)) {
     return true;
   } else {
-    m_error = "Cannot play " + std::string(path);
+    m_error = "Failed to play " + std::string(path);
     return false;
   }
 }
@@ -402,6 +402,7 @@ void MP3Player::SetPlayNo(uint32_t playNo, bool stop) {
   if (stop) {
     audioStopSong();
   }
+
   uint32_t size = m_list.size();
   if (size) {
     m_playNo = (playNo + size) % size;
@@ -448,7 +449,6 @@ bool MP3Player::AutoPlay(void) {
     std::string path = GetFilePath(m_playNo);
     if (!audioConnecttoSD(path.c_str())) {
       m_error = "Failed to play " + path;
-      DBG_EXEC(printf("%s\n", m_error.c_str()));
       return false;
     }
   }
@@ -458,11 +458,13 @@ bool MP3Player::AutoPlay(void) {
 //--------------------------------------------------------------------------------
 // Optional functions for audio-I2S (defined in CYD_Audio.h as a weak function)
 //--------------------------------------------------------------------------------
-#if   false
+#if   DEBUG_AUDIO
 void audio_info(const char *info) {
   Serial.print("info        ");
   Serial.println(info);
 }
+#endif
+/*
 void audio_id3data(const char *info) {  // id3 metadata
   Serial.print("id3tags     ");
   Serial.println(info);
@@ -495,4 +497,4 @@ void audio_lasthost(const char *info) {  // stream URL played
   Serial.print("lasthost    ");
   Serial.println(info);
 }
-#endif
+*/

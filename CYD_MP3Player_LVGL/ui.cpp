@@ -645,7 +645,6 @@ void ui_event_ScreenSetting(lv_event_t *e) {
 
         // Change the procedure depending on the screen
         lv_obj_t *screen = lv_screen_active();
-
         if (screen == ui_ScreenMain) {
           // Reset and create a new playlist
           ui_state = UI_STATE_RESET;
@@ -805,7 +804,8 @@ UI_State_t ui_loop(void) {
       if (!check_favorite()) {
         ui_state = UI_STATE_NEXT;
       } else if (!player.AutoPlay()) {
-        ui_state = UI_STATE_ERROR;
+        log_e(player.GetError());
+        ui_state = UI_STATE_NEXT;
       }
       break;
     case UI_STATE_STOP:
