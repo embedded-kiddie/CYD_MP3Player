@@ -73,8 +73,8 @@
   WiFi.mode(WIFI_OFF);            \
   esp_sleep_pd_config(ESP_PD_DOMAIN_VDDSDIO,    ESP_PD_OPTION_OFF); \
   esp_sleep_pd_config(ESP_PD_DOMAIN_MODEM,      ESP_PD_OPTION_OFF); \
-*/esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF); \
-  esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);         \
+  esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF); \
+*/esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);         \
 }
 
 #endif // _PERIPHERALS_H

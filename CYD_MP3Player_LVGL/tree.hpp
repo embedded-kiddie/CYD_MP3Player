@@ -110,7 +110,7 @@ public:
 private:
   // check the file extension
   bool check_ext(const char *path) {
-    const char* ext[] = MP3_FILE_EXT;
+    const char* const ext[] = MP3_FILE_EXT;
     for (int i = 0; i < sizeof(ext) / sizeof(ext[0]); i++) {
       if (strcmp(&path[strlen(path) - strlen(ext[i])], ext[i]) == 0) {
         return true;
@@ -145,7 +145,7 @@ private:
 #else
       const char *name = fd.name();
 #endif
-      if (IS_VALID_FILE(name)) {
+      if (MP3_IS_VALID(name)) {
         if (fd.isDirectory()) {
           scan_node(fd, node->append(name), scan_file);
         }

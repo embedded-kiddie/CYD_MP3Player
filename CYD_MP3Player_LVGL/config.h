@@ -1,7 +1,6 @@
 //================================================================================
 // MP3Player Configration
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
-//  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
@@ -11,21 +10,33 @@
 //--------------------------------------------------------------------------------
 #define TFT_WIDTH       240   // Portrait orientation default width
 #define TFT_HEIGHT      320   // Portrait orientation default height
-#define TFT_ROTATION    0     // 0: Portrait, 3: Portrait (Upside down)
+#define TFT_ROTATION    0     // 0: Portrait, 2: Portrait (Upside down)
 
 //--------------------------------------------------------------------------------
-// 2. Graphic library configuration
-// Below are for the LovyanGFX library for the "ESP32-2432S028R" (aka CYD).
-// If the LCD panel auto-detection feature does not work, define the panel type.
+// 2.1 Display type configuration
+// Set the appropriate display type to "GFX_DISPLAY_TYPE".
 //--------------------------------------------------------------------------------
+#define CYD_2432S028R_1USB  0 // Panel driver: ILI9341 (micro-USB x 1 type)
+#define CYD_2432S028R_2USB  1 // Panel driver: ST7789  (micro-USB x 1 + USB-C x 1 type)
+#define CROWPANEL_HMI_2432  2 // CrowPanel HMI 2.4"/2.8" (LCD & touch share the SPI bus)
+
+#define GFX_DISPLAY_TYPE    CYD_2432S028R_2USB
+
+//--------------------------------------------------------------------------------
+// 2.2 Graphic library configuration
+// Set the desired library type to "GFX_LIBRARY_TYPE".
+// Note: TFT_eSPI is applied only for CrowPanel HMI 2.4/2.8 inch
+//--------------------------------------------------------------------------------
+#define USE_LOVYANGFX     0 // LovyanGFX (Highly recommended)
+#define USE_TFT_ESPI      1 // TFT_eSPI (Slower than LovyanGFX)
+
+#define GFX_LIBRARY_TYPE  USE_LOVYANGFX
+
+// Configure LovyanGFX's auto-detection of display panel type only for CYD
 // true  : Use the LGFX auto-detect feature
-// false : Define the appropriate LCD panel driver type to "DISPLAY_CYD_2USB"
-#define USE_AUTODETECT  true
-
-#if (USE_AUTODETECT == false)
-// false: Panel driver: ILI9341 (micro-USB x 1 type)
-// true : Panel driver: ST7789  (micro-USB x 1 + USB-C x 1 type)
-#define DISPLAY_CYD_2USB  true
+// false : Define the appropriate LCD panel driver type to "GFX_DISPLAY_TYPE"
+#if (GFX_DISPLAY_TYPE <= CYD_2432S028R_2USB) && (GFX_LIBRARY_TYPE == USE_LOVYANGFX)
+#define USE_AUTODETECT    true
 #endif
 
 //--------------------------------------------------------------------------------
@@ -49,7 +60,7 @@
 //--------------------------------------------------------------------------------
 #define MP3_ROOT_PATH     "/MP3/"                       // Root folder for storing music files
 #define MP3_FILE_EXT      {".m4a", ".mp3", ".wav"}      // Define the preferred extension first
-#define IS_VALID_FILE(f)  (*(f) != '@' && *(f) != '.')  // Folder/file name prefix (1 char) to exclude
+#define MP3_IS_VALID(f)   (*(f) != '@' && *(f) != '.')  // Folder/file name prefix (1 char) to exclude
 
 //--------------------------------------------------------------------------------
 // 6. File that stores settings related to the operation of this player
@@ -67,7 +78,7 @@
 
 //--------------------------------------------------------------------------------
 // 8. Album list configuration under "PARTITION_PATH"
-// The list to classify albums is saved under "PARTITION_PATH" as a text file.
+// An album list is saved under "PARTITION_PATH" as a text file.
 // Also the configuration for each classification is saved as a JSON file.
 //--------------------------------------------------------------------------------
 #define ALBUM_LIST_PATH   "@album/"       // Album list configuration folder

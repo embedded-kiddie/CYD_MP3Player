@@ -1,5 +1,6 @@
 //================================================================================
 // Defining debugging functions
+//  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //================================================================================
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
