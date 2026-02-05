@@ -7,7 +7,7 @@
 //  ## Software Requirement
 //  1. Required platform package
 //    - esp32 by Espressif Systems version 2.0.17
-//      - Note that version 3.x deprecates I2S audio and produces a clicking noise.
+//      - Note: I2S audio is deprecated in version 3.x and it produces a clicking noise.
 //    - Select "ESP32 Dev Module" as a board package
 //    - In the "Tools" menu, select the following:
 //      - Partition Scheme: "Huge APP (3MB No OTA/1MB SPIFFS)"
@@ -106,7 +106,7 @@ void setup() {
   lv_display_set_flush_cb(disp, my_disp_flush);
 
 #if USE_HEAP_MALLOC
-  draw_buf = (uint8_t*)heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+  draw_buf = (uint8_t*)heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_DEFAULT);
 #endif
   lv_display_set_buffers(disp, draw_buf, NULL, DRAW_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
 

@@ -141,6 +141,10 @@ static void play_stop(void) {
   player.StopPlay();
 }
 
+static bool play_auto(void) {
+  return player.AutoPlay();
+}
+
 //--------------------------------------------------------------------------------
 // Update bar and label according to elapsed time
 //--------------------------------------------------------------------------------
@@ -803,7 +807,7 @@ UI_State_t ui_loop(void) {
     case UI_STATE_PLAY:
       if (!check_favorite()) {
         ui_state = UI_STATE_NEXT;
-      } else if (!player.AutoPlay()) {
+      } else if (!play_auto()) {
         log_e(player.GetError());
         ui_state = UI_STATE_NEXT;
       }
