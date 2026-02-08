@@ -80,11 +80,11 @@ typedef enum {
 
 //////////////////// SETTINGS / CONTROLL ////////////////////
 typedef struct {
-  uint8_t   repeat;           // true: repeat
-  bool      favorite;         // true: a heart mark
-  bool      shuffle;          // true: shuffle, false: in sequence
-  uint8_t   partition_max;    // maximum partitions   (0, ...PARTITION_MAX)
+  uint8_t   repeat;           // true: play repeatedly
+  uint8_t   shuffle;          // true: shuffle, false: in sequence
+  uint8_t   favorite;         // true: play only favorite songs
   uint8_t   partition_id;     // current partition ID (0, ...partition_max)
+  uint8_t   partition_max;    // maximum partitions   (0, ...PARTITION_MAX)
   uint8_t   selectBacklight;  // 0: 30sec, 1: 1min, ...
   uint8_t   selectSleepTimer; // 0: 30min, 1: 1hour, ...
   uint8_t   spare;
@@ -123,7 +123,7 @@ void ui_event_Volume        (lv_event_t *e);
 void ui_event_ElapsedBar    (lv_event_t *e);
 void ui_event_GoToAlbumList (lv_event_t *e);
 void ui_event_GoToPlayList  (lv_event_t *e);
-void ui_event_GoToSettings  (lv_event_t *e);
+void ui_event_GoToSetting   (lv_event_t *e);
 void ui_event_Favorite      (lv_event_t *e);
 void ui_event_Repeat        (lv_event_t *e);
 void ui_event_Shuffle       (lv_event_t *e);
@@ -135,7 +135,7 @@ void ui_event_VolumeMin     (lv_event_t *e);
 void ui_init(void);
 UI_State_t ui_loop(void);
 void ui_redisplay (void);
-void ui_set_playNo(uint32_t playNo);
+void ui_set_playNo(uint32_t playNo, bool event_in_playlist = false);
 const uint32_t ui_get_playNo(void);
 const uint32_t ui_get_counts(void);
 

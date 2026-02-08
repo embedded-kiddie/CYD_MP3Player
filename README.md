@@ -19,6 +19,8 @@ This example creates a task named `audioplay` on core 0 with a predefined set of
 This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Player` to scan the audio files on the SD card, create a playlist, and control continuous playback in a set order.
 
 ### [CYD_MP3Player_LVGL](CYD_MP3Player_LVGL)
+[![CYD MP3 Music Player](images/CYD-MP3-Music-Player.jpg)](https://youtu.be/sG8XH6JwQDA "")
+
 This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
 
 The `MP3Player` class has been extended to meet the requirements of UI components.

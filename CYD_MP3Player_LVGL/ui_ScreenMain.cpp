@@ -149,7 +149,7 @@ void ui_ScreenMain_screen_init(void) {
     lv_obj_add_style    (obj, &style_default_U, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_DEFAULT);
     lv_obj_add_style    (obj, &style_checked_U, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_CHECKED);
     lv_obj_add_style    (obj, &style_pressed,   (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_PRESSED);
-    lv_obj_add_event_cb (obj, ui_event_GoToSettings, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb (obj, ui_event_GoToSetting, LV_EVENT_CLICKED, NULL);
   }
 #endif // SHOW_ARROW_BUTTON
 

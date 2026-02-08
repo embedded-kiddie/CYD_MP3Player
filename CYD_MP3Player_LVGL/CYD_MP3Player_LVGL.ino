@@ -75,11 +75,7 @@ static void my_print(lv_log_level_t level, const char *buf) {
 
 // Use Arduino millis() as tick source
 static uint32_t my_tick(void) {
-#if SAVE_SEQUENCIAL_BMP
-  return millis() - _skip;
-#else
   return millis();
-#endif
 }
 
 void setup() {

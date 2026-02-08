@@ -57,8 +57,8 @@ static void display_photo(uint32_t playNo) {
   buf[1] = ':';
 
   // Skip drive letter "S:"
-  std::string dir = player.GetFilePath(playNo);
-  strncpy(&buf[2], dir.c_str(), sizeof(buf) - 2);
+  std::string path = player.GetFilePath(playNo);
+  strncpy(&buf[2], path.c_str(), sizeof(buf) - 2);
   buf[sizeof(buf) - 1] = '\0';
 
   // @photo.jpg
@@ -72,6 +72,7 @@ static void display_photo(uint32_t playNo) {
   }
 
   // title.jpg
+  strncpy(&buf[2], path.c_str(), sizeof(buf) - 2);
   if (ptr = strrchr(buf, '.')) {
     strncpy(ptr, ALBUM_PHOTO_EXT, sizeof(ALBUM_PHOTO_EXT));
     if (SD.exists(buf + 2)) {
@@ -102,32 +103,38 @@ static void display_photo(uint32_t playNo) {
 }
 
 //--------------------------------------------------------------------------------
-// Control next/previous play or stop/continuous play
+// Control player: auto, next/previous or stop/continuous
 //--------------------------------------------------------------------------------
+static bool play_auto(void) {
+  return player.AutoPlay();
+}
+
 static bool play_next(bool next) {
+  bool ret = true;
+
   if (ui_ScreenPlayList) {
     ui_list_update_cell(ui_control.focusNo, false);
     ui_list_update_icon(ui_control.playNo,  false);
   }
 
-  bool ret = true;
-  if (ui_setting.favorite) {
-    ret = player.NextSelected(next, (ui_setting.repeat ? true : false));
-  } else {
-    if (next) {
+  // When an audio file that is not favorite is selected in the playlist
+  if (bitRead(ui_setting.favorite, 7)) {
+    bitClear(ui_setting.favorite, 7);
+    ret = play_auto();
+  }
+
+  else {
+    if (ui_setting.favorite) {
+      ret = player.NextSelected(next, (ui_setting.repeat ? true : false));
+    } else if (next) {
       player.PlayNext();
     } else {
       player.PlayPrev();
     }
+
+    bitClear(ui_setting.repeat, 7);     // Clear bit set by ui_event_Button{Next|Prev}()
+    ui_set_playNo(player.GetPlayNo());  // Clear ID3 tag, set ui_control and display photo
   }
-
-  bitClear(ui_setting.repeat, 7); // clear the bit that has been temporarily forced set
-
-  ui_control.playNo = ui_control.focusNo = player.GetPlayNo();
-  display_photo(ui_control.playNo);
-
-  // Update ui_control and look of the play button
-  lv_obj_set_state(ui_ButtonPlay, LV_STATE_CHECKED, true);
 
   if (ui_ScreenPlayList) {
     ui_list_update_play(ui_control.playNo, true);
@@ -139,10 +146,6 @@ static bool play_next(bool next) {
 static void play_stop(void) {
   lv_obj_set_state(ui_ButtonPlay, LV_STATE_CHECKED, false);
   player.StopPlay();
-}
-
-static bool play_auto(void) {
-  return player.AutoPlay();
 }
 
 //--------------------------------------------------------------------------------
@@ -165,10 +168,16 @@ static void update_elapsed_time(void) {
 
   lv_label_set_text_fmt(ui_ElapsedStart, "%" LV_PRIu32 ":%02" LV_PRIu32, elapsed  / 60, elapsed  % 60);
   lv_label_set_text_fmt(ui_ElapsedEnd,   "%" LV_PRIu32 ":%02" LV_PRIu32, duration / 60, duration % 60);
+
+  // In case ID3 tags are empty
+  if (id3tags.title.empty() || id3tags.artist.empty() || id3tags.album.empty()) {
+    player.GetID3Tags(player.GetPlayNo(), id3tags);
+    ui_state = UI_STATE_ID3;
+  }
 }
 
 //--------------------------------------------------------------------------------
-// Save / Load ui_settings to / from SD card
+// Save / Load ui_setting to / from SD card
 //--------------------------------------------------------------------------------
 static bool save_setting(void) {
   // Save partition
@@ -184,20 +193,31 @@ static bool save_setting(void) {
 }
 
 static bool load_setting(void) {
-  File fd = SD.open(MP3_ROOT_PATH MP3_SETTING_FILE, FILE_READ);
-  if (!fd) {
-    player.SetError("can't load " MP3_ROOT_PATH MP3_SETTING_FILE);
-    return false;
+  bool save = false;
+
+  if (SD.exists(MP3_ROOT_PATH MP3_SETTING_FILE)) {
+    File fd = SD.open(MP3_ROOT_PATH MP3_SETTING_FILE, FILE_READ);
+    if (!fd) {
+      player.SetError("can't load " MP3_ROOT_PATH MP3_SETTING_FILE);
+      return false;
+    }
+
+    // Save the sleep timer setting
+    uint8_t sleepTimer = ui_setting.selectSleepTimer;
+
+    fd.read((uint8_t *)&ui_setting, sizeof(ui_setting));
+    fd.close();
+
+    // Restore the setting
+    ui_setting.selectSleepTimer = sleepTimer;
+    bitClear(ui_setting.repeat,   7);
+    bitClear(ui_setting.favorite, 7);
   }
 
-  // Save the sleep timer setting
-  uint8_t sleepTimer = ui_setting.selectSleepTimer;
-
-  fd.read((uint8_t *)&ui_setting, sizeof(ui_setting));
-  fd.close();
-
-  // Restore the setting of sleep timer
-  ui_setting.selectSleepTimer = sleepTimer;
+  // For the first time
+  else {
+    save = true;
+  }
 
   // Check if the partition exists
   char buf[BUF_SIZE];
@@ -211,8 +231,6 @@ static bool load_setting(void) {
       break;
     }
   }
-
-  bool save = false;
 
   if (ui_setting.partition_max != partition_max) {
     ui_setting.partition_max = partition_max;
@@ -260,16 +278,7 @@ static bool auto_saving(void) {
       player.PauseResume();
     }
 
-    // Update the playback duration at the end of file
-    if (autoSaving & SAVE_DURATION) {
-      uint32_t playNo = player.GetPlayNo();
-      ui_list_update_duration(playNo, id3tags.meta.duration);
-      if (player.PutMetaData(playNo, &id3tags.meta)) {
-        autoSaving ^= SAVE_DURATION;
-      }
-    }
-
-    // Update all favorites that have been modified during playback
+    // 1. Update all favorites that have been modified during playback
     if (autoSaving & SAVE_FAVORITE) {
       // Prevent assert() from being fired by node reordering
       lv_obj_t *screen = lv_screen_active();
@@ -284,7 +293,21 @@ static bool auto_saving(void) {
       }
     }
 
-    // Update favorite and repeat when they are changed during playback
+    // 2. Update the playback duration at the end of file
+    if (autoSaving & SAVE_DURATION) {
+      uint32_t playNo = player.GetPlayNo();
+      ui_list_update_duration(playNo, id3tags.meta.duration);
+
+      MP3Meta_t meta;
+      player.GetMetaData(playNo, &meta);
+      id3tags.meta.selected = meta.selected;
+
+      if (player.PutMetaData(playNo, &id3tags.meta)) {
+        autoSaving ^= SAVE_DURATION;
+      }
+    }
+
+    // 3. Update favorite and repeat when they are changed during playback
     if (autoSaving & SAVE_SETTING) {
       if (save_setting()) {
         autoSaving ^= SAVE_SETTING;
@@ -319,7 +342,7 @@ static bool create_playlist(void) {
     ui_album_load((void*)player.m_tree);
 
     // Scan audio files base on album list
-    if (player.ScanAudioFiles(ui_setting.partition_id, ui_setting.shuffle)) {
+    if (player.ScanAudioFiles(ui_setting.shuffle)) {
       ui_set_playNo(ui_control.playNo);
       return true;
     }
@@ -329,7 +352,7 @@ static bool create_playlist(void) {
 }
 
 static bool reset_playlist(void) {
-  // Stop playback before saving settings to avoid conflict with SD access
+  // Stop playback before saving ui_setting to avoid conflict with SD access
   play_stop();
   player.DeleteNodeTree();  // delete m_tree
   player.ClearAudioFiles(); // m_list.clear()
@@ -406,7 +429,7 @@ void ui_event_GoToPlayList(lv_event_t *e) {
   change_screen(UI_SCREEN_MAIN, &ui_ScreenPlayList, LV_SCR_LOAD_ANIM_MOVE_LEFT, &ui_ScreenPlayList_screen_init);
 }
 
-void ui_event_GoToSettings(lv_event_t *e) {
+void ui_event_GoToSetting(lv_event_t *e) {
   DBG_ASSERT(lv_event_get_code(e) == LV_EVENT_CLICKED);
 
   change_screen(UI_SCREEN_MAIN, &ui_ScreenSetting, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, &ui_ScreenSetting_screen_init);
@@ -445,6 +468,7 @@ void ui_event_Shuffle(lv_event_t *e) {
 
   lv_obj_t *obj = lv_event_get_target_obj(e);
   ui_setting.shuffle = (lv_obj_get_state(obj) & LV_STATE_CHECKED ? true : false);
+
   player.StopPlay();
   player.ClearAudioFiles();
 
@@ -625,6 +649,7 @@ void ui_event_ScreenSetting(lv_event_t *e) {
   else if (event_code == LV_EVENT_GESTURE) {
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
     lv_screen_load_anim_t anim = (dir == LV_DIR_TOP ? LV_SCR_LOAD_ANIM_MOVE_TOP : LV_SCR_LOAD_ANIM_MOVE_BOTTOM);
+
     if (screenFrom == UI_SCREEN_MAIN) {
       change_screen(UI_SCREEN_SETTING, &ui_ScreenMain, anim, &ui_ScreenMain_screen_init);
     } else if (screenFrom == UI_SCREEN_ALBUM_LIST) {
@@ -650,13 +675,9 @@ void ui_event_ScreenSetting(lv_event_t *e) {
         // Change the procedure depending on the screen
         lv_obj_t *screen = lv_screen_active();
         if (screen == ui_ScreenMain) {
-          // Reset and create a new playlist
-          ui_state = UI_STATE_RESET;
-        }
-
-        else if (screen == ui_ScreenAlbumList) {
-          // Reset and create a new album list
-          ui_state = UI_STATE_ALBUM;
+          ui_state = UI_STATE_RESET;  // Reset and create a new playlist
+        } else if (screen == ui_ScreenAlbumList) {
+          ui_state = UI_STATE_ALBUM;  // Reset and create a new album list
         }
       }
     }
@@ -698,7 +719,21 @@ void ui_redisplay(void) {
 //--------------------------------------------------------------------------------
 // Start to play with the specified track
 //--------------------------------------------------------------------------------
-void ui_set_playNo(uint32_t track_id) {
+void ui_set_playNo(uint32_t track_id, bool event_in_playlist) {
+  // Clear ID3 tag
+  id3tags.title.clear();
+  id3tags.album.clear();
+  id3tags.artist.clear();
+
+  // When an audio file that is not favorite is selected in the playlist
+  if (event_in_playlist && ui_setting.favorite) {
+    MP3Tags_t tags;
+    player.GetID3Tags(track_id, tags);
+    if (!tags.meta.selected) {
+      bitSet(ui_setting.favorite, 7);
+    }
+  }
+
   // Start the specified track to play
   player.SetPlayNo(track_id);
 
@@ -733,7 +768,7 @@ void ui_get_id3tags(uint32_t track_id, MP3Tags_t &tags) {
 
 //--------------------------------------------------------------------------------
 // Optional functions for audio-I2S (defined in CYD_Audio.h as a weak function)
-// Note: These functions will be executed in the context of CORE 1.
+// Note: This function is called for each tag in the context of CORE 1.
 //--------------------------------------------------------------------------------
 void audio_id3data(const char *info) {
   // Avoid a race condition with ui_state set by audio_eof_mp3()
@@ -753,7 +788,7 @@ void audio_id3data(const char *info) {
 }
 
 void audio_eof_mp3(const char *info) {
-  // Note: When the Elapse bar is operated by hand, it will be shifted.
+  // Note: When the elapse bar is operated by hand, the duration will be shifted.
   MP3Meta_t meta;
   player.GetMetaData(player.GetPlayNo(), &meta);
   if (meta.duration == 0 || abs(meta.duration - id3tags.meta.duration) >= 5 /* [sec] */) {
