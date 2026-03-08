@@ -64,7 +64,7 @@ The links below explain how to connect external DAC modules.
 
 - [Audio I2S mod - ESP32-2432S028 aka Cheap Yellow Display example project][6]
 
-In this case, please define the symbol `USE_I2S_DAC` and each pin appropriately in [audioTask() in CYD28_audio.cpp](CYD28_audio.cpp#L35-L43).
+In this case, please define the symbol `USE_I2S_DAC` and each pin appropriately in [audioTask() in CYD28_audio.cpp](/CYD_MP3Player_LVGL/CYD28_audio.cpp#L35-L43).
 
 ```c++
 void audioTask(void *parameter)
