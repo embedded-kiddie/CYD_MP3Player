@@ -33,10 +33,10 @@
 #include <SdFat.h>  // https://github.com/greiman/SdFat
 #else
 #include <SD.h>
-#include <SD_MMC.h>
+//#include <SD_MMC.h>
 //#include <SPIFFS.h>
-#include <FS.h>
-#include <FFat.h>
+//#include <FS.h>
+//#include <FFat.h>
 #endif // SDFATFS_USED
 
 #include "CYD_DSP.h" // various DSP functions

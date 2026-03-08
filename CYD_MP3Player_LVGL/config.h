@@ -33,6 +33,7 @@
 #define GFX_LIBRARY_TYPE  USE_LOVYANGFX
 
 // Configure LovyanGFX's auto-detection of display panel type only for CYD
+// If auto-detection does not work on some models, set USE_AUTODETECT to false
 // true  : Use the LGFX auto-detect feature
 // false : Define the appropriate LCD panel driver type to "GFX_DISPLAY_TYPE"
 #if (GFX_DISPLAY_TYPE <= CYD_2432S028R_2USB) && (GFX_LIBRARY_TYPE == USE_LOVYANGFX)

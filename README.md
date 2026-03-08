@@ -4,9 +4,12 @@ MP3 music player for Cheap Yellow Display
 ## Library & Sketches
 
 ### [CYD_Audio](CYD_Audio)
-CYD_Audio is an [ESP32 I2S audio library][0] by [Piotr Zapart][1], written for PlatformIO.
+CYD_Audio is an [ESP32 I2S audio library][2] based on [schreibfaul1/ESP32-audioI2S][1] and customized by [Piotr Zapart][3] for the CYD with an internal DAC and onboard amplifier IC.
 
-The version included here has been modified for Arduino IDE so that it can be installed into the `libraries` folder in your Arduino sketchbook folder.
+Originally written for PlatformIO, the version included here has been modified for the Arduino IDE and can be installed in the `libraries` folder within your Arduino sketchbook folder.
+
+#### Note
+This library works fine with ESP32 core version 2.0.17, but [in 3.x the I2S driver][9] has been [completely redesigned and refactored to use the new ESP-IDF driver][10], which deprecates some functions and causes issues such as clicking noises.
 
 ### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
 This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.
@@ -38,47 +41,28 @@ The circuitry around the onboard audio amplifier (SB8002B) requires to adjust th
 ![ILI9341 vs ST7789](images/CYD-ILI9341-ST7789.jpg)
 </details>
 
+The resistor settings around the SC8002B on the ST7789 type CYD are very different from those on the ILI9341, and the gain is too high, resulting in terribly poor sound quality.
+
 The following links are good resources to help you solve this problem.
 
-- [Audio amp gain mod - ESP32-2432S028 aka Cheap Yellow Display example project][2].
-- [ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube][3]
+- [Audio amp gain mod - ESP32-2432S028 aka Cheap Yellow Display example project][4].
+- [ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube][5]
 
-Even when I changed the resistors of ST7789 to the same as ILI9341, the high frequencies were crushed and the sound became rough, making it unsuitable for listening to the music, so I ended up doing the following:
+#### Alternatives to ST7789 type modification
+By simply replacing two resistors, you can get almost the same output as the ILI9341 type with the following settings:
 
-#### ILI9341 modification
-<details>
-<summary>Decrease the resistance value of R9</summary>
-
-![Decrease the resistance value of R9](images/CYD-ILI9341-SC8002B.jpg)
-</details>
-
-#### ST7789 modification
-<details>
-<summary>Replace resistors R8 and R9</summary>
+![The resistor settings around the audio amplifier](images/CYD-ST7789-modified.webp)
 
 | Resister | Before modification | After modification |
 | :------: | ------------------: | -----------------: |
 | R7       | 0 Ω                 | 0 Ω                |
 | R8       | 0 Ω                 | 22 KΩ              |
-| R9       | 68 KΩ               | 10 KΩ              |
-</details>
-
-#### 440 Hz/sine wave sound test
-<details>
-<summary>Oscilloscope observation results</summary>
-
-![ILI9341 vs ST7789](images/CYD-SineWave-400Hz.jpg)
-
-![ILI9341 vs ST7789](images/CYD-SineWave-All.jpg)
-</details>
-
-The results show that the audio amplifier IC SC8002B is not suitable for music playback.
+| R9       | 68 KΩ               | 15 KΩ              |
 
 ### Use External DAC and Amplifier
 The links below explain how to connect external DAC modules.
 
-- [Audio I2S mod - ESP32-2432S028 aka Cheap Yellow Display example project][4]
-- [CYD’s Note 2025 - macsbug][5]
+- [Audio I2S mod - ESP32-2432S028 aka Cheap Yellow Display example project][6]
 
 In this case, please define the symbol `USE_I2S_DAC` and each pin appropriately in [audioTask() in CYD28_audio.cpp](CYD28_audio.cpp#L35-L43).
 
@@ -96,13 +80,28 @@ void audioTask(void *parameter)
 }
 ```
 
-## Special Thanks
-- [ESP32 I2S audio library][0] by [hexeguitar/ESP32_TFT_PIO][6] (MIT license).
+where:
 
-[0]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
-[1]: https://github.com/hexeguitar "hexeguitar (Piotr Zapart)"
-[2]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-amp-gain-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
-[3]: https://www.youtube.com/watch?v=6JCLHIXXVus "ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube"
-[4]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-i2s-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
-[5]: https://macsbug.wordpress.com/2025/04/18/cyds-note-2025/ "CYD&#8217;s Note 2025 | macsbug"
-[6]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
+| Symbol          | Value |
+| --------------- | -----:|
+| `I2S_BCK_PIN`   | 4     |
+| `I2S_LRCLK_PIN` | 22    |
+| `I2S_DIN_PIN`   | 27    |
+
+Similar modifications can also be found at the following site:
+
+- [CYD’s Note 2025 - macsbug][7]
+
+## Special Thanks
+- [ESP32 I2S audio library][2] by [hexeguitar/ESP32_TFT_PIO][8] (MIT license).
+
+[1]: https://github.com/schreibfaul1/ESP32-audioI2S "schreibfaul1/ESP32-audioI2S: Play mp3 files from SD via I2S"
+[2]: https://github.com/hexeguitar/ESP32_TFT_PIO/tree/main/Examples/CYD28_BaseProject/lib/CYD_Audio "ESP32_TFT_PIO/Examples/CYD28_BaseProject/lib/CYD_Audio at main · hexeguitar/ESP32_TFT_PIO"
+[3]: https://github.com/hexeguitar "hexeguitar (Piotr Zapart)"
+[4]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-amp-gain-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
+[5]: https://www.youtube.com/watch?v=6JCLHIXXVus "ESP32-2432S028 aka Cheap Yellow Display - fixing the audio issues - YouTube"
+[6]: https://github.com/hexeguitar/ESP32_TFT_PIO?tab=readme-ov-file#audio-i2s-mod "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
+[7]: https://macsbug.wordpress.com/2025/04/18/cyds-note-2025/ "CYD&#8217;s Note 2025 | macsbug"
+[8]: https://github.com/hexeguitar/ESP32_TFT_PIO "hexeguitar/ESP32_TFT_PIO: Example project for the ESP32-2432S028 &quot;Cheap Yellow Display&quot; board."
+[9]: https://docs.espressif.com/projects/arduino-esp32/en/latest/api/i2s.html "I2S -  -  &mdash; Arduino ESP32 latest documentation"
+[10]: https://docs.espressif.com/projects/arduino-esp32/en/latest/migration_guides/2.x_to_3.0.html#i2s "Migration from 2.x to 3.0 -  -  &mdash; Arduino ESP32 latest documentation"
