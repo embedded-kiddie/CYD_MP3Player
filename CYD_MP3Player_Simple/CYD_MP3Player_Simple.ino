@@ -13,7 +13,7 @@ void setup() {
 
   player.begin();               // Mount the SD card
   player.SetVolume(8);          // Set the volume
-  player.ScanFileList("/", 3);  // Scan up to the 3 level and create a playlist
+  player.ScanFileList("/MP3", 3);  // Scan up to the 3 level and create a playlist
   player.SortFileList(true);    // Sort the playlist in ascending order
 }
 

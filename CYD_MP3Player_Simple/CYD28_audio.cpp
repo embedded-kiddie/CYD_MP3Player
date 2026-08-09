@@ -82,22 +82,22 @@ void audioTask(void *parameter)
 					audioTxTaskMessage.ret = audio.getRMS();
 					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
-				case CONNECTTOHOST:
+				/*case CONNECTTOHOST:
 					audioTxTaskMessage.cmd = CONNECTTOHOST;
 					audioTxTaskMessage.ret = audio.connecttohost(audioRxTaskMessage.txt1);
 					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
-					break;
+					break;*/
 				case CONNECTTOSD:
 					audioTxTaskMessage.cmd = CONNECTTOSD;
 					log_i("msg: %s", audioRxTaskMessage.txt1);
 					audioTxTaskMessage.ret = audio.connecttoSD(audioRxTaskMessage.txt1);
 					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
 					break;
-				case CONNECTTOSPEECH:
+				/*case CONNECTTOSPEECH:
 					audioTxTaskMessage.cmd = CONNECTTOSPEECH;
 					audioTxTaskMessage.ret = audio.connecttospeech(audioRxTaskMessage.txt1, audioRxTaskMessage.txt2);
 					xQueueSend(audioGetQueue, &audioTxTaskMessage, portMAX_DELAY);
-					break;
+					break;*/
 				case AUDIO_STOP:
 					audioTxTaskMessage.cmd = AUDIO_STOP;
 					audio.stopSong();

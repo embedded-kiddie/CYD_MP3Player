@@ -108,7 +108,7 @@
 // │   │   ├── @meta.dat          │   │   ├── Arbum1.1/
 // │   │   ├── @photo.jpg         │   │   │   ├── @meta.dat
 // │   │   ├── 01 title01.m4a     │   │   │   ├── @photo.jpg
-// │   │   ├── 02 title02.m4a     │   │   ├── 01 title01.m4a
+// │   │   ├── 02 title02.m4a     │   │   │   ├── 01 title01.m4a
 // │   │   └── ...                │   │   │   ├── 02 title02.m4a
 // │   ├── Arbum1.2/              │   │   │   └── ...
 // │   │   └── ...                │   │   ├── Arbum1.2/
