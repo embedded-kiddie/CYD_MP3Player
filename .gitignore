@@ -6,9 +6,11 @@
 !README.md
 !LICENSE
 
+!CYD_Audio
 !CYD_MP3Player_Basic
+!CYD_MP3Player_Simple
 !CYD_MP3Player_LVGL
-
+!images
 
 # VSCODE
 */.theia
