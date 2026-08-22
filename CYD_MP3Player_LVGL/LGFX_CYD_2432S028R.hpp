@@ -25,15 +25,26 @@
 #define CYD_TP_CS       33
 #endif
 
-// false: Panel driver: ILI9341 (micro-USB x 1 type)
-// true : Panel driver: ST7789  (micro-USB x 1 + USB-C x 1 type)
-#if !defined(CYD_2432S028R_1USB) && !defined(CYD_2432S028R_2USB)
-#error CYD_2432S028R_xUSB should be defined (where x is 1 or 2).
+// https://pan.jczn1688.com/directlink/1/HMI%20display/JC2432W328.zip
+#if (GFX_DISPLAY_TYPE == CYD_JC2432W328_ST7789)
+  #undef  CYD_TFT_BL
+  #define CYD_TFT_BL    27
+#endif
+
+//--------------------------------------------------------------------------------
+// LCD driver IC
+//--------------------------------------------------------------------------------
+#if (GFX_DISPLAY_TYPE == CYD_2432S028R_2USB) || \
+    (GFX_DISPLAY_TYPE == CYD_JC2432W328_ST7789) || \
+    (GFX_DISPLAY_TYPE == CYD_FREENOVE_ST7789)
+  #define ST7789_DRIVER
+#else
+  #define ILI9341_DRIVER
 #endif
 
 class LGFX : public lgfx::LGFX_Device
 {
-#if CYD_2432S028R_2USB
+#ifdef ST7789_DRIVER
   lgfx::Panel_ST7789    _panel_instance;
 #else
   lgfx::Panel_ILI9341   _panel_instance;
@@ -43,7 +54,6 @@ class LGFX : public lgfx::LGFX_Device
   lgfx::Touch_XPT2046   _touch_instance;
 
 public:
-
   // Create a constructor and set various settings here.
   LGFX(void)
   {
@@ -54,7 +64,7 @@ public:
       cfg.spi_host = HSPI_HOST;     // Select the SPI (ESP32-S2,C3: SPI2_HOST or SPI3_HOST / ESP32: VSPI_HOST or HSPI_HOST)
       // Due to the ESP-IDF version upgrade, the VSPI_HOST and HSPI_HOST are deprecated, so if an error occurs, use SPI2_HOST and SPI3_HOST instead.
       cfg.spi_mode = 0;             // SPI communication mode (0 to 3)
-#if CYD_2432S028R_2USB
+#ifdef ST7789_DRIVER
       cfg.freq_write = 80000000;    // SPI clock for transmit (Maximum 80MHz, rounded to an integer value of 80MHz)
 #else
       cfg.freq_write = 40000000;    // SPI clock for transmit (Maximum 80MHz, rounded to an integer value of 80MHz)
@@ -85,7 +95,7 @@ public:
       cfg.panel_height     =   320;  // Panel height
       cfg.offset_x         =     0;  // Panel offset in X direction
       cfg.offset_y         =     0;  // Panel offset in Y direction
-#if CYD_2432S028R_2USB
+#ifdef ST7789_DRIVER
       cfg.offset_rotation  =     0;  // Rotation direction offset 0~7 (4~7 are upside down)
       cfg.dummy_read_pixel =    16;  // Number of dummy read bits before pixel read
 #else
@@ -127,7 +137,7 @@ public:
       cfg.y_max =  200;         // Maximum Y value (raw value) from touch screen
       cfg.pin_int = CYD_TP_IRQ; // Interrupt pin number
       cfg.bus_shared = false;   // Set to true if the bus shared with the screen
-#if CYD_2432S028R_2USB
+#ifdef ST7789_DRIVER
       cfg.offset_rotation = 2;  // Adjust when display and touch orientation do not match (0~7)
 #else
       cfg.offset_rotation = 0;  // Adjust when display and touch orientation do not match (0~7)

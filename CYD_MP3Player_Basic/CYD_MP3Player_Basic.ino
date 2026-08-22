@@ -1,5 +1,8 @@
 #include "CYD28_audio.h"
 
+// For products from Elegoo or Freenove, you need to activate the audio amplifier IC.
+// #define AUDIO_EN  4
+
 void setup() {
   Serial.begin(115200);
   while (millis() < 1000);
@@ -8,6 +11,11 @@ void setup() {
     Serial.println("Cannot begin SD.");
     while (1);
   }
+
+#ifdef AUDIO_EN
+  pinMode(AUDIO_EN, OUTPUT);
+  digitalWrite(AUDIO_EN, LOW);
+#endif
 
   audioInit();  // Create a task to play audio file
   delay(10);    // Wait until the task on Core 1 is ready to receive a command

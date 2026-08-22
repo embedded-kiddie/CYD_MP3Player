@@ -55,12 +55,12 @@
 Select [ESP32 Dev Module][2] as a board.
 
 ### 3.3. Libraries
-| Name                                | Version      |
-| ----------------------------------- | ------------ |
-| [LVGL][4] by kisvegabor             | 9.2.2 - 9.5.0|
-| [LovyanGFX][5] by lovyan03          | 1.2.7        |
-| [SdFat][6] by Bill Greiman          | 2.3.0        |
-| [ArduinoJson][7] by Benoit Blanchon | 7.4.2, 7.4.3 |
+| Name                                | Version              |
+| ----------------------------------- | -------------------- |
+| [LVGL][4] by kisvegabor             | 9.2.2 - 9.5.0        |
+| [LovyanGFX][5] by lovyan03          | 1.2.7, 1.2.19 and up |
+| [SdFat][6] by Bill Greiman          | 2.3.0                |
+| [ArduinoJson][7] by Benoit Blanchon | 7.4.2, 7.4.3         |
 
 ### 3.4. Library configuration
 
@@ -145,7 +145,7 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
   You can kill all the IDE related processes by the following command in the Terminal APP on Mac.
   
   ```bash
-  ps -axc｜grep -i arduino｜awk '{print $1}'｜xargs -I@ kill -9 @
+  ps -axc | grep -i arduino | awk '{print $1}' | xargs -I@ kill -9 @
   ```
 
 - Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.

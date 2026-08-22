@@ -7,13 +7,19 @@
 #ifndef _SDSPI_H_
 #define _SDSPI_H_
 
-#ifdef  SDFATFS_USED  // defined in CYD_Audio.h
+//--------------------------------------------------------------------------------
+// Chip select pin and SPI clock frequency
+//--------------------------------------------------------------------------------
+#define SD_CS         SS
+#define SD_SPI_CLOCK  24000000 // The maximum SD SPI clock of ESP32-2432S028 would be 24 MHz
 
-#define USE_SDFAT
 //--------------------------------------------------------------------------------
 // SdFat library
 // https://github.com/greiman/SdFat
 //--------------------------------------------------------------------------------
+#ifdef  SDFATFS_USED  // defined in CYD_Audio.h
+
+#define USE_SDFAT
 #define DISABLE_FS_H_WARNING
 #include <SdFat.h>
 
@@ -59,12 +65,6 @@ enum SeekMode {
 #define SDFS_SIZE size
 
 #endif // SdFat or SD
-
-//--------------------------------------------------------------------------------
-// Chip select pin and SPI clock frequency
-//--------------------------------------------------------------------------------
-#define SD_CS         SS
-#define SD_SPI_CLOCK  24000000 // The maximum SD SPI clock of ESP32-2432S028 would be 24 MHz
 
 //--------------------------------------------------------------------------------
 // Temporary buffer size for file path

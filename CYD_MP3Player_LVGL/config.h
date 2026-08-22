@@ -16,16 +16,20 @@
 // 2.1 Display type configuration
 // Set the appropriate display type to "GFX_DISPLAY_TYPE".
 //--------------------------------------------------------------------------------
-#define CYD_2432S028R_1USB  0 // Panel driver: ILI9341 (micro-USB x 1 type)
-#define CYD_2432S028R_2USB  1 // Panel driver: ST7789  (micro-USB x 1 + USB-C x 1 type)
-#define CROWPANEL_HMI_2432  2 // CrowPanel HMI 2.4"/2.8" (LCD & touch share the SPI bus)
+#define CYD_2432S028R_1USB    1 // Guition 2432S028R ILI9341 (micro-USB x 1 type)
+#define CYD_2432S028R_2USB    2 // Guition 2432S028R ST7789  (micro-USB x 1 + USB-C x 1 type)
+#define CYD_JC2432W328_ST7789 3 // Guition JC2432W328 ST7789 (USB-C x 1 type)
+#define CYD_ELEGOO_ILI9341    4 // ELEGOO E32R28T ILI9341V
+#define CYD_FREENOVE_ILI9341  5 // Freenove FNK0114F_2P8 ILI9341
+#define CYD_FREENOVE_ST7789   6 // Freenove FNK0114B_2P8 ST7789
+#define CYD_ELECROW_ILI9341   7 // Elecrow CrowPanel ESP32 HMI ILI9341V
 
-#define GFX_DISPLAY_TYPE    CYD_2432S028R_2USB
+#define GFX_DISPLAY_TYPE  CYD_2432S028R_2USB
 
 //--------------------------------------------------------------------------------
 // 2.2 Graphic library configuration
 // Set the desired library type to "GFX_LIBRARY_TYPE".
-// Note: TFT_eSPI is applied only for CrowPanel HMI 2.4/2.8 inch
+// Note: TFT_eSPI can only be used with the "CYD_ELECROW_ILI9341"
 //--------------------------------------------------------------------------------
 #define USE_LOVYANGFX     0 // LovyanGFX (Highly recommended)
 #define USE_TFT_ESPI      1 // TFT_eSPI (Slower than LovyanGFX)

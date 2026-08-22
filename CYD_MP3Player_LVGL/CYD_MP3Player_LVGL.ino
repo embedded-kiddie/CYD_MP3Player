@@ -84,7 +84,7 @@ void setup() {
   delay(1000);
 #endif
 
-  RGB_LED_OFF();
+  init_peripherals();
   tft_init();
   lv_init();
 

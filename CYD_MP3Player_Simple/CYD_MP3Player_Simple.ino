@@ -2,12 +2,20 @@
 
 CYD_MP3Player player;
 
+// For products from Elegoo or Freenove, you need to activate the audio amplifier IC.
+// #define AUDIO_EN  4
+
 /*--------------------------------------------------------------------------------
  * Setup and Loop
  *--------------------------------------------------------------------------------*/
 void setup() {
   Serial.begin(115200);
   while (millis() < 1000);
+
+#ifdef AUDIO_EN
+  pinMode(AUDIO_EN, OUTPUT);
+  digitalWrite(AUDIO_EN, LOW);
+#endif
 
   audioInit();                  // Create a task to play audio file
 

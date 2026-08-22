@@ -9,15 +9,15 @@
 //----------------------------------------------------------------------
 // LovyanGFX configuration
 //----------------------------------------------------------------------
-#if (GFX_DISPLAY_TYPE <= CYD_2432S028R_2USB)
+#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341)
+  #include "LGFX_ELECROW_2432R.hpp"
+#else
   #if USE_AUTODETECT
     #define LGFX_AUTODETECT
     #include <LovyanGFX.h>
   #else
     #include "LGFX_CYD_2432S028R.hpp"
   #endif
-#else
-  #include "LGFX_ELECROW_2432R.hpp"
 #endif
 
 static LGFX tft;
@@ -100,6 +100,10 @@ static void tft_init(void) {
 //----------------------------------------------------------------------
 // TFT_eSPI configuration
 //----------------------------------------------------------------------
+#if (GFX_DISPLAY_TYPE != CYD_ELECROW_ILI9341)
+  #error "TFT_eSPI can only be used with the CYD_ELECROW_ILI9341."
+#endif
+
 #include <TFT_eSPI.h>
 
 static TFT_eSPI tft = TFT_eSPI();

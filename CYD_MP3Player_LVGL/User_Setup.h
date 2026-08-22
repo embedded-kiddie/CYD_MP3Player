@@ -93,11 +93,7 @@
 // With an ILI9341 display 40MHz works OK, 80MHz sometimes fails
 // With a ST7735 display more than 27MHz may not work (spurious pixels and lines)
 // With an ILI9163 display 27 MHz works OK.
-#if (GFX_DISPLAY_TYPE == CYD_2432S028R_2USB)
-#define SPI_FREQUENCY  80000000
-#else
 #define SPI_FREQUENCY  40000000
-#endif
 
 // Optional reduced SPI frequency for reading TFT
 #define SPI_READ_FREQUENCY  20000000
