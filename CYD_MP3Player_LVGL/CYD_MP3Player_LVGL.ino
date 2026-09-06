@@ -79,7 +79,7 @@ static uint32_t my_tick(void) {
 }
 
 void setup() {
-#if (!USE_CALIBRATED) || (DEBUG_AUDIO) || (DEBUG & 2)
+#if (EXEC_CALIBRATION) || (DEBUG_AUDIO) || (DEBUG & 2)
   Serial.begin(115200);
   delay(1000);
 #endif

@@ -21,11 +21,15 @@
 #define TP_MOSI   TFT_MOSI
 #define TP_SCLK   TFT_SCLK
 #define TP_CS     33
-#define TP_IRQ    38
+#define TP_IRQ    36
 
 class LGFX : public lgfx::LGFX_Device
 {
+#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341)
   lgfx::Panel_ILI9341 _panel_instance;
+#else
+  lgfx::Panel_ST7789  _panel_instance;
+#endif
   lgfx::Bus_SPI       _bus_instance;
   lgfx::Light_PWM     _light_instance;
   lgfx::Touch_XPT2046 _touch_instance;
@@ -69,8 +73,13 @@ public:
       cfg.panel_height     =   320;  // 実際に表示可能な高さ
       cfg.offset_x         =     0;  // パネルのX方向オフセット量
       cfg.offset_y         =     0;  // パネルのY方向オフセット量
+#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341)
       cfg.offset_rotation  =     2;  // 回転方向の値のオフセット 0~7 (4~7は上下反転)
       cfg.dummy_read_pixel =     8;  // ピクセル読出し前のダミーリードのビット数
+#else
+      cfg.offset_rotation  =     0;  // 回転方向の値のオフセット 0~7 (4~7は上下反転)
+      cfg.dummy_read_pixel =    16;  // Number of dummy read bits before pixel read
+#endif
       cfg.dummy_read_bits  =     1;  // ピクセル以外のデータ読出し前のダミーリードのビット数
       cfg.readable         =  true;  // データ読出しが可能な場合 trueに設定
       cfg.invert           = false;  // パネルの明暗が反転してしまう場合 trueに設定

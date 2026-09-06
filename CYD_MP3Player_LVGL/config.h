@@ -24,7 +24,7 @@
 #define CYD_FREENOVE_ST7789   6 // Freenove FNK0114B_2P8 ST7789
 #define CYD_ELECROW_ILI9341   7 // Elecrow CrowPanel ESP32 HMI ILI9341V
 
-#define GFX_DISPLAY_TYPE  CYD_2432S028R_2USB
+#define GFX_DISPLAY_TYPE  CYD_ELECROW_ILI9341
 
 //--------------------------------------------------------------------------------
 // 2.2 Graphic library configuration
@@ -36,22 +36,22 @@
 
 #define GFX_LIBRARY_TYPE  USE_LOVYANGFX
 
-// Configure LovyanGFX's auto-detection of display panel type only for CYD
-// If auto-detection does not work on some models, set USE_AUTODETECT to false
-// true  : Use the LGFX auto-detect feature
-// false : Define the appropriate LCD panel driver type to "GFX_DISPLAY_TYPE"
+// Configure LovyanGFX's auto-detection of display panel type only for CYD.
+// If auto-detection does not work on some variants, set USE_AUTODETECT to false.
+// true  : Use the LGFX auto-detection feature (which increase available memory).
+// false : Define the appropriate LCD panel driver type to "GFX_DISPLAY_TYPE".
 #if (GFX_DISPLAY_TYPE <= CYD_2432S028R_2USB) && (GFX_LIBRARY_TYPE == USE_LOVYANGFX)
-#define USE_AUTODETECT    true
+#define USE_AUTODETECT    false
 #endif
 
 //--------------------------------------------------------------------------------
 // 3. Touch panel calibration
 // If there's some slippage with the default parameters, execute calibration and
-// embed the results displayed on the serial monitor into "MP3Player.ino".
+// embed the results shown on the serial monitor at "tft_init()" in "gfx.hpp".
 //--------------------------------------------------------------------------------
-// true  : Use embedded data in "MP3Player.ino"
-// false : Execute touch calibration at power-on
-#define USE_CALIBRATED    true
+// false : Use embedded data at "tft_init()" in "gfx.hpp"
+// true  : Execute touch calibration at power-on
+#define EXEC_CALIBRATION  false
 
 //--------------------------------------------------------------------------------
 // 4. Custom fonts configuration

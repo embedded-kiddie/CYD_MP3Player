@@ -9,7 +9,7 @@
 //----------------------------------------------------------------------
 // LovyanGFX configuration
 //----------------------------------------------------------------------
-#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341)
+#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341) || (GFX_DISPLAY_TYPE == CYD_JC2432W328_ST7789)
   #include "LGFX_ELECROW_2432R.hpp"
 #else
   #if USE_AUTODETECT
@@ -72,7 +72,11 @@ static void tft_init(void) {
   tft.setColorDepth(16);  // Set to 16-bit RGB565
 
   if (tft.touch()) {
-    if (USE_CALIBRATED) {
+    if (EXEC_CALIBRATION) {
+      uint16_t cal[8];
+      calibrate_touch(cal);
+      tft.setTouchCalibrate((uint16_t*)cal);
+    } else {
       // The following is equivalent to the `_touch_instance` setting in `LGFX_CYD_2432S028R.hpp`.
       // The `cal[8]` can be replaced with the result displayed on the serial monitor after calibration.
       const uint16_t cal[8] = {
@@ -85,10 +89,6 @@ static void tft_init(void) {
         3800,  // x_max
         200    // y_max
       };
-      tft.setTouchCalibrate((uint16_t*)cal);
-    } else {
-      uint16_t cal[8];
-      calibrate_touch(cal);
       tft.setTouchCalibrate((uint16_t*)cal);
     }
   } else {
@@ -150,12 +150,14 @@ static void tft_init(void) {
   tft.setRotation(TFT_ROTATION);
 
   // Touch calibration parameters for TFT_eSPI
-  if (USE_CALIBRATED) {
-    uint16_t cal[5] = { 285, 3500, 200, 3500, 2 };
-    tft.setTouch(cal);
-  } else {
+  if (EXEC_CALIBRATION) {
     uint16_t cal[5];
     calibrate_touch(cal);
+    tft.setTouch(cal);
+  } else {
+    // The following are the default calibration parameters for the touch panel.
+    // The `cal[5]` can be replaced with the result displayed on the serial monitor after calibration.
+    uint16_t cal[5] = { 285, 3500, 200, 3500, 2 };
     tft.setTouch(cal);
   }
 }
