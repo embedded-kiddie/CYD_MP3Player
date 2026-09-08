@@ -1,9 +1,12 @@
 //================================================================================
 // N-ary Tree for directory tree
+//  Description:
+//    This class manages the music files to be played in an N-ary tree structure.
+//  Reference:
+//    https://www.geeksforgeeks.org/dsa/tree-data-structure/
+//    https://www.geeksforgeeks.org/dsa/generic-treesn-array-trees/
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
-//  https://www.geeksforgeeks.org/dsa/tree-data-structure/
-//  https://www.geeksforgeeks.org/dsa/generic-treesn-array-trees/
 //================================================================================
 #include "tree.hpp"
 

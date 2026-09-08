@@ -1,5 +1,5 @@
 //                            USER DEFINED SETTINGS
-//   Set driver type, fonts to be loaded, pins used and SPI control method etc
+//   Set driver type, fonts to be loaded, pins used and SPI control method etc.
 //
 //   See the User_Setup_Select.h file if you wish to be able to define multiple
 //   setups and then easily select which setup file is used by the compiler.
@@ -8,17 +8,13 @@
 //   run without the need to make any more changes for a particular hardware setup!
 //   Note that some sketches are designed for a particular TFT pixel width/height
 
+#include "pinout_esp32.h"
+
 // User defined information reported by "Read_User_Setup" test & diagnostics example
 #define USER_SETUP_INFO "User_Setup"
 
 // Define to disable all #warnings in library (can be put in User_Setup_Select.h)
 //#define DISABLE_ALL_LIBRARY_WARNINGS
-
-//===================================================================================
-// CrowPanel ESP32 HMI 2.8-inch
-// https://github.com/Elecrow-RD/CrowPanel-ESP32-Display-Course-File
-// https://www.elecrow.com/wiki/esp32-display-282727-intelligent-touch-screen-wi-fi26ble-240320-hmi-display.html
-//===================================================================================
 
 // ##################################################################################
 //
@@ -27,10 +23,31 @@
 // ##################################################################################
 
 // Only define one driver, the other ones must be commented out
-#define ILI9341_DRIVER       // Generic driver for common displays
+#ifdef  ILI9341_DRIVER    // In case it is defined in "pinout_esp32.h"
+#undef  ILI9341_DRIVER    // Undefine symbol defined in "pinout_esp32.h"
+#define ILI9341_2_DRIVER  // Minimal configuration option, define additional parameters below for this display
+#endif
 
-#define TFT_WIDTH  240
-#define TFT_HEIGHT 320
+#ifdef  ST7789_DRIVER     // In case it is defined in "pinout_esp32.h"
+#undef  ST7789_DRIVER     // Undefine symbol defined in "pinout_esp32.h"
+#define ST7789_2_DRIVER   // Minimal configuration option, define additional parameters below for this display
+#endif
+
+// For ST7735, ST7789 and ILI9341 ONLY, define the colour order IF the blue and red are swapped on your display
+// Try ONE option at a time to find the correct colour order for your display
+//  #define TFT_RGB_ORDER TFT_RGB  // Colour order Red-Green-Blue
+//  #define TFT_RGB_ORDER TFT_BGR  // Colour order Blue-Green-Red
+
+// If colours are inverted (white shows as black) then uncomment one of the next
+// 2 lines try both options, one of the options should correct the inversion.
+// #define TFT_INVERSION_OFF
+// #define TFT_INVERSION_ON
+
+#if defined(CYD_JC2432W328_ST7789)
+//#define TFT_INVERSION_OFF
+//#define TFT_RGB_ORDER TFT_BGR  // Colour order Blue-Green-Red
+#endif
+
 
 // ##################################################################################
 //
@@ -44,19 +61,19 @@
 // driven with a PWM signal or turned OFF/ON then this must be handled by the user
 // sketch. e.g. with digitalWrite(TFT_BL, LOW);
 
-#define TFT_BL   27
+//#define TFT_BL   27          // LED back-light control pin
 #define TFT_BACKLIGHT_ON HIGH  // Level to turn ON back-light (HIGH or LOW)
 
-// For ESP32 Dev board (only tested with GC9A01 display)
+// For ESP32 Dev board (only tested with ILI9341 display)
 // The hardware SPI can be mapped to any pins
-#define TFT_MISO 12
-#define TFT_MOSI 13
-#define TFT_SCLK 14
-#define TFT_CS   15
-#define TFT_DC   2
-#define TFT_RST  -1
+//#define TFT_MISO    12
+//#define TFT_MOSI    13
+//#define TFT_SCLK    14
+//#define TFT_CS      15
+//#define TFT_DC      2
+//#define TFT_RST     -1
+#define TOUCH_CS    TP_CS
 
-#define TOUCH_CS 33
 
 // ##################################################################################
 //
@@ -82,6 +99,7 @@
 // this will save ~20kbytes of FLASH
 #define SMOOTH_FONT
 
+
 // ##################################################################################
 //
 // Section 4. Other options
@@ -93,15 +111,35 @@
 // With an ILI9341 display 40MHz works OK, 80MHz sometimes fails
 // With a ST7735 display more than 27MHz may not work (spurious pixels and lines)
 // With an ILI9163 display 27 MHz works OK.
-#define SPI_FREQUENCY  40000000
+
+// #define SPI_FREQUENCY   1000000
+// #define SPI_FREQUENCY   5000000
+// #define SPI_FREQUENCY  10000000
+// #define SPI_FREQUENCY  20000000
+// #define SPI_FREQUENCY  27000000
+// #define SPI_FREQUENCY  40000000  // This is defined in "pinout_esp32.h"
+// #define SPI_FREQUENCY  55000000  // STM32 SPI1 only (SPI2 maximum is 27MHz)
+// #define SPI_FREQUENCY  80000000
 
 // Optional reduced SPI frequency for reading TFT
 #define SPI_READ_FREQUENCY  20000000
 
 // The XPT2046 requires a lower SPI clock rate of 2.5MHz so we define that here:
-#define SPI_TOUCH_FREQUENCY  600000
+#define SPI_TOUCH_FREQUENCY  2500000
 
 // The ESP32 has 2 free SPI ports i.e. VSPI and HSPI, the VSPI is the default.
 // If the VSPI port is in use and pins are not accessible (e.g. TTGO T-Beam)
 // then uncomment the following line:
-#define USE_HSPI_PORT   // Avoid conflict with SD card on VSPI
+//#define USE_HSPI_PORT
+
+// Comment out the following #define if "SPI Transactions" do not need to be
+// supported. When commented out the code size will be smaller and sketches will
+// run slightly faster, so leave it commented out unless you need it!
+
+// Transaction support is needed to work with SD library but not needed with TFT_SdFat
+// Transaction support is required if other SPI devices are connected.
+
+// Transactions are automatically enabled by the library for an ESP32 (to use HAL mutex)
+// so changing it here has no effect
+
+// #define SUPPORT_TRANSACTIONS

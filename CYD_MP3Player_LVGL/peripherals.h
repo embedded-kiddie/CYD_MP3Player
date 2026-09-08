@@ -1,56 +1,47 @@
 //================================================================================
-// ESP32 onboard built-in peripherals
-// Target board: ESP32 Dev Module / ESP32-2432S028R CYD
-// https://github.com/espressif/arduino-esp32/tree/master/variants/esp32
-// https://github.com/espressif/arduino-esp32/tree/master/variants/jczn_2432s028r
+// Definition of on-board peripherals for the ESP32-2432S028R variants
 //================================================================================
-#ifndef _PERIPHERALS_H
-#define _PERIPHERALS_H
+#pragma once
 
-// When using "ESP32-2432S028R CYD" as the platform/board type with ESP32 core 3.x
-#if defined(CYD_LED_RGB_OFF)
-  #define RGB_LED_ON()  CYD_LED_RGB_ON()
-  #define RGB_LED_OFF() CYD_LED_RGB_OFF()
+#define LED_RED   4     // CYD_ELECROW_ILI9341: IO4_PORT_AD
+#define LED_GREEN 16    // CYD_ELECROW_ILI9341: IO16_RXD2 on UART1 terminal
+#define LED_BLUE  17    // CYD_ELECROW_ILI9341: IO17_TXD2 on UART1 terminal
 
-// When using "ESP32 Dev Module" as the platform/board type with ESP32 core 2.0.17
-#else
-  #define CYD_LED_RED   4
-  #define CYD_LED_GREEN 16
-  #define CYD_LED_BLUE  17
+#define LED_RED_OFF()   (digitalWrite(LED_RED,   1))
+#define LED_RED_ON()    (digitalWrite(LED_RED,   0))
+#define LED_GREEN_OFF() (digitalWrite(LED_GREEN, 1))
+#define LED_GREEN_ON()  (digitalWrite(LED_GREEN, 0))
+#define LED_BLUE_OFF()  (digitalWrite(LED_BLUE,  1))
+#define LED_BLUE_ON()   (digitalWrite(LED_BLUE,  0))
 
-  #define CYD_LED_RED_OFF()   (digitalWrite(CYD_LED_RED,   1))
-  #define CYD_LED_RED_ON()    (digitalWrite(CYD_LED_RED,   0))
-  #define CYD_LED_GREEN_OFF() (digitalWrite(CYD_LED_GREEN, 1))
-  #define CYD_LED_GREEN_ON()  (digitalWrite(CYD_LED_GREEN, 0))
-  #define CYD_LED_BLUE_OFF()  (digitalWrite(CYD_LED_BLUE,  1))
-  #define CYD_LED_BLUE_ON()   (digitalWrite(CYD_LED_BLUE,  0))
-  #define CYD_LED_RGB_OFF() \
-    CYD_LED_RED_OFF();      \
-    CYD_LED_GREEN_OFF();    \
-    CYD_LED_BLUE_OFF()
-  #define CYD_LED_RGB_ON()  \
-    CYD_LED_RED_ON();       \
-    CYD_LED_GREEN_ON();     \
-    CYD_LED_BLUE_ON()
-  #define CYD_LED_WHITE_OFF() CYD_LED_RGB_OFF()
-  #define CYD_LED_WHITE_ON()  CYD_LED_RGB_ON()
-#endif
+#define LED_RGB_OFF() \
+  LED_RED_OFF();      \
+  LED_GREEN_OFF();    \
+  LED_BLUE_OFF()
+#define LED_RGB_ON()  \
+  LED_RED_ON();       \
+  LED_GREEN_ON();     \
+  LED_BLUE_ON()
 
-#define RGB_LED_OFF() {           \
-  pinMode(CYD_LED_RED,   OUTPUT); \
-  pinMode(CYD_LED_GREEN, OUTPUT); \
-  pinMode(CYD_LED_BLUE,  OUTPUT); \
-  CYD_LED_RGB_OFF();              \
+#define RGB_LED_ON() {        \
+  pinMode(LED_RED,   OUTPUT); \
+  pinMode(LED_GREEN, OUTPUT); \
+  pinMode(LED_BLUE,  OUTPUT); \
+  LED_RGB_ON();               \
+}
+#define RGB_LED_OFF() {       \
+  pinMode(LED_RED,   OUTPUT); \
+  pinMode(LED_GREEN, OUTPUT); \
+  pinMode(LED_BLUE,  OUTPUT); \
+  LED_RGB_OFF();              \
 }
 
 // In some CYD variants, it's necessary to resolve the conflict between
 // the audio amplifier IC (SC8002B) shutdown signal and the RGB red LED
-#if (GFX_DISPLAY_TYPE == CYD_ELEGOO_ILI9341) || \
-    (GFX_DISPLAY_TYPE == CYD_FREENOVE_ILI9341) || \
-    (GFX_DISPLAY_TYPE == CYD_FREENOVE_ST7789)
-  #define AUDIO_EN    4
-  #undef  CYD_LED_RED
-  #define CYD_LED_RED 22
+#if defined(CYD_FREENOVE_ST7789) || defined(CYD_FREENOVE_ILI9341) || defined(CYD_ELEGOO_ILI9341)
+  #define AUDIO_EN  4
+  #undef  LED_RED
+  #define LED_RED   22
 #endif
 
 // Enabling/Disabling the audio amplifier IC (SC8002B)
@@ -96,5 +87,4 @@
   esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_OFF); \
 */esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL); \
 }
-
-#endif // _PERIPHERALS_H
+// avoid "warning: backslash-newline at end of file"

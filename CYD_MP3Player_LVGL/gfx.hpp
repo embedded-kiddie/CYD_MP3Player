@@ -5,19 +5,15 @@
 #include "config.h"
 #include "peripherals.h"
 
-#if (GFX_LIBRARY_TYPE == USE_LOVYANGFX)
+#if defined(USE_LOVYANGFX)
 //----------------------------------------------------------------------
 // LovyanGFX configuration
 //----------------------------------------------------------------------
-#if (GFX_DISPLAY_TYPE == CYD_ELECROW_ILI9341)
-  #include "LGFX_ELECROW_2432R.hpp"
+#if USE_AUTODETECT && (defined(CYD_2432S028R_1USB) || defined(CYD_2432S028R_2USB))
+  #define LGFX_AUTODETECT
+  #include <LovyanGFX.h>
 #else
-  #if USE_AUTODETECT
-    #define LGFX_AUTODETECT
-    #include <LovyanGFX.h>
-  #else
-    #include "LGFX_CYD_2432S028R.hpp"
-  #endif
+  #include "LGFX_CYD_2432S028R.hpp"
 #endif
 
 static LGFX tft;
@@ -72,9 +68,15 @@ static void tft_init(void) {
   tft.setColorDepth(16);  // Set to 16-bit RGB565
 
   if (tft.touch()) {
-    if (USE_CALIBRATED) {
+    if (EXEC_CALIBRATION) {
+      uint16_t cal[8];
+      calibrate_touch(cal);
+      tft.setTouchCalibrate((uint16_t*)cal);
+    } else {
+      //************************************************************************************************
       // The following is equivalent to the `_touch_instance` setting in `LGFX_CYD_2432S028R.hpp`.
       // The `cal[8]` can be replaced with the result displayed on the serial monitor after calibration.
+      //************************************************************************************************
       const uint16_t cal[8] = {
         240,   // x_min
         3700,  // y_min
@@ -86,22 +88,18 @@ static void tft_init(void) {
         200    // y_max
       };
       tft.setTouchCalibrate((uint16_t*)cal);
-    } else {
-      uint16_t cal[8];
-      calibrate_touch(cal);
-      tft.setTouchCalibrate((uint16_t*)cal);
     }
   } else {
     Serial.println("Touch device not found.");
   }
 }
 
-#elif (GFX_LIBRARY_TYPE == USE_TFT_ESPI)
+#elif defined(USE_TFT_ESPI)
 //----------------------------------------------------------------------
 // TFT_eSPI configuration
 //----------------------------------------------------------------------
-#if (GFX_DISPLAY_TYPE != CYD_ELECROW_ILI9341)
-  #error "TFT_eSPI can only be used with the CYD_ELECROW_ILI9341."
+#if !defined(CYD_JC2432W328_ST7789) && !defined(CYD_ELECROW_ILI9341)
+  #error "TFT_eSPI is available only for CYD_JC2432W328_ST7789 and CYD_ELECROW_ILI9341."
 #endif
 
 #include <TFT_eSPI.h>
@@ -150,12 +148,16 @@ static void tft_init(void) {
   tft.setRotation(TFT_ROTATION);
 
   // Touch calibration parameters for TFT_eSPI
-  if (USE_CALIBRATED) {
-    uint16_t cal[5] = { 285, 3500, 200, 3500, 2 };
-    tft.setTouch(cal);
-  } else {
+  if (EXEC_CALIBRATION) {
     uint16_t cal[5];
     calibrate_touch(cal);
+    tft.setTouch(cal);
+  } else {
+    //************************************************************************************************
+    // The following are the default calibration parameters for the touch panel.
+    // The `cal[5]` can be replaced with the result displayed on the serial monitor after calibration.
+    //************************************************************************************************
+    uint16_t cal[5] = { 285, 3500, 200, 3500, 2 };
     tft.setTouch(cal);
   }
 }

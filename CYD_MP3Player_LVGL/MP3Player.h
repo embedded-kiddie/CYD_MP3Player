@@ -1,5 +1,7 @@
 //================================================================================
 // MP3Player class definition
+//  Description:
+//    This class manages music files on the SD card and playlists.
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================
