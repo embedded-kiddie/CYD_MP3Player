@@ -1,5 +1,7 @@
 //================================================================================
 // MP3Player class definition
+//  Description:
+//    This class manages music files on the SD card and playlists.
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================
@@ -236,6 +238,7 @@ bool MP3Player::PutMetaData(uint32_t playNo, MP3Meta_t *meta) {
     list->meta = *meta;
     return SaveMetaData(playNo, meta);
   }
+
   return false; // Never get here
 }
 
@@ -248,6 +251,7 @@ bool MP3Player::UpdateMetaData(void) {
     }
     ++i;
   }
+
   return ret;
 }
 

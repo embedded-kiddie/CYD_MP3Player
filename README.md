@@ -107,6 +107,16 @@ Similar modifications can also be found at the following site:
 
 - [CYD’s Note 2025 - macsbug][7]
 
+## CYD Variants List
+
+| Symbol                                            | Link                                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `CYD_2432S028R_1USB`,<br> `CYD_2432S028R_2USB`    | - [witnessmenow/ESP32-Cheap-Yellow-Display][20]                                 |
+| `CYD_JC2432W328_ST7789`                           | - [maxpill/JC2432W328][25]                                                      |
+| `CYD_FREENOVE_ST7789`,<br> `CYD_FREENOVE_ILI9341` | - [Freenove ESP32 Display][24]<br>- [Freenove/Freenove_ESP32_Display][26]       |
+| `CYD_ELECROW_ILI9341`                             | - [CrowPanel ESP32 HMI 2.8-inch Display][22]                                    |
+| `CYD_ELEGOO_ILI9341`                              | - [ESP32 2.8 Inch dispaly Instruction][23]<br>- [2.8inch ESP32-32E Display][27] |
+
 ## Download Link
 - [GUITION-LINK](https://pan.jczn1688.com/ "UITION-DISK · Cloud Storage")
     - ESP32 module
@@ -131,3 +141,6 @@ Similar modifications can also be found at the following site:
 [22]: https://www.elecrow.com/wiki/esp32-display-282727-intelligent-touch-screen-wi-fi26ble-240320-hmi-display.html "CrowPanel ESP32 HMI 2.8-inch Display - Elecrow Wiki"
 [23]: https://wiki.elegoo.com/oshw-parts-&-accessories/esp32-dispaly-introduction "ESP32 2.8 Inch dispaly Instruction | ELEGOO Wiki"
 [24]: https://docs.freenove.com/projects/fnk0103/en/latest/ "FNK0103/FNK0114 &mdash; fnk0103-docs v1.0.0 documentation"
+[25]: https://github.com/maxpill/JC2432W328 "maxpill/JC2432W328: This repository contains documentation related to the JC2432W328 board equipped with the ST7789 display controller."
+[26]: https://github.com/Freenove/Freenove_ESP32_Display "Freenove/Freenove_ESP32_Display: Apply to FNK0103"
+[27]: https://www.lcdwiki.com/2.8inch_ESP32-32E_Display "2.8inch ESP32-32E Display - LCD wiki"

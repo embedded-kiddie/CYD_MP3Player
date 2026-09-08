@@ -2,47 +2,40 @@
 // MP3Player Configration
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //================================================================================
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#pragma once
 
 //--------------------------------------------------------------------------------
-// 1. TFT Screen configuration
+// 1. LCD Screen definition
 //--------------------------------------------------------------------------------
 #define TFT_WIDTH       240   // Portrait orientation default width
 #define TFT_HEIGHT      320   // Portrait orientation default height
 #define TFT_ROTATION    0     // 0: Portrait, 2: Portrait (Upside down)
 
 //--------------------------------------------------------------------------------
-// 2.1 Display type configuration
-// Set the appropriate display type to "GFX_DISPLAY_TYPE".
+// 2.1 Define the specific CYD variant type
+// Select one of the following definitions and uncomment it.
 //--------------------------------------------------------------------------------
-#define CYD_2432S028R_1USB    1 // Guition 2432S028R ILI9341 (micro-USB x 1 type)
-#define CYD_2432S028R_2USB    2 // Guition 2432S028R ST7789  (micro-USB x 1 + USB-C x 1 type)
-#define CYD_JC2432W328_ST7789 3 // Guition JC2432W328 ST7789 (USB-C x 1 type)
-#define CYD_ELEGOO_ILI9341    4 // ELEGOO E32R28T ILI9341V
-#define CYD_FREENOVE_ILI9341  5 // Freenove FNK0114F_2P8 ILI9341
-#define CYD_FREENOVE_ST7789   6 // Freenove FNK0114B_2P8 ST7789
-#define CYD_ELECROW_ILI9341   7 // Elecrow CrowPanel ESP32 HMI ILI9341V
-
-#define GFX_DISPLAY_TYPE  CYD_ELECROW_ILI9341
+  #define CYD_2432S028R_1USB    // Guition 2432S028R ILI9341 (micro-USB x 1 type)
+//#define CYD_2432S028R_2USB    // Guition 2432S028R ST7789  (micro-USB x 1 + USB-C x 1 type)
+//#define CYD_JC2432W328_ST7789 // Guition JC2432W328 ST7789 (USB-C x 1 type)
+//#define CYD_FREENOVE_ST7789   // Freenove FNK0114B_2P8 ST7789
+//#define CYD_FREENOVE_ILI9341  // Freenove FNK0114F_2P8 ILI9341
+//#define CYD_ELECROW_ILI9341   // Elecrow CrowPanel ESP32 HMI ILI9341V
+//#define CYD_ELEGOO_ILI9341    // ELEGOO E32R28T ILI9341V
 
 //--------------------------------------------------------------------------------
-// 2.2 Graphic library configuration
-// Set the desired library type to "GFX_LIBRARY_TYPE".
-// Note: TFT_eSPI can only be used with the "CYD_ELECROW_ILI9341"
+// 2.2 Select Graphic library
+// Select one of the graphic libraries below and uncomment it.
+// Note: TFT_eSPI is available only for "CYD_ELECROW_ILI9341".
 //--------------------------------------------------------------------------------
-#define USE_LOVYANGFX     0 // LovyanGFX (Highly recommended)
-#define USE_TFT_ESPI      1 // TFT_eSPI (Slower than LovyanGFX)
+//#define USE_TFT_ESPI    // TFT_eSPI (Slower than LovyanGFX)
+  #define USE_LOVYANGFX   // LovyanGFX (Highly recommended)
 
-#define GFX_LIBRARY_TYPE  USE_LOVYANGFX
-
-// Configure LovyanGFX's auto-detection of display panel type only for CYD.
+// Configure LovyanGFX auto-detection of display driver type only for original CYD.
 // If auto-detection does not work on some variants, set USE_AUTODETECT to false.
 // true  : Use the LGFX auto-detection feature (which increase available memory).
-// false : Define the appropriate LCD panel driver type to "GFX_DISPLAY_TYPE".
-#if (GFX_DISPLAY_TYPE <= CYD_2432S028R_2USB) && (GFX_LIBRARY_TYPE == USE_LOVYANGFX)
-#define USE_AUTODETECT    false
-#endif
+// false : Define the appropriate CYD variant type in section 2.1.
+#define USE_AUTODETECT    false // "CYD_2432S028R_1USB" or "CYD_2432S028R_2USB" only
 
 //--------------------------------------------------------------------------------
 // 3. Touch panel calibration
@@ -56,7 +49,7 @@
 //--------------------------------------------------------------------------------
 // 4. Custom fonts configuration
 // Configure the font for displaying artists, albums, and songs.
-// For information on how to generate font data files, see "fonts/README.md".
+// Refer to "fonts/README.md" for information on how to generate font data files.
 //--------------------------------------------------------------------------------
 #define USE_CUSTOM_FONTS  true
 
@@ -65,7 +58,7 @@
 //--------------------------------------------------------------------------------
 #define MP3_ROOT_PATH     "/MP3/"                       // Root folder for storing music files
 #define MP3_FILE_EXT      {".m4a", ".mp3", ".wav"}      // Define the preferred extension first
-#define MP3_IS_VALID(f)   (*(f) != '@' && *(f) != '.')  // Folder/file name prefix (1 char) to exclude
+#define MP3_IS_VALID(f)   (*(f) != '@' && *(f) != '.')  // Folder/File name prefix (1 char) to exclude
 
 //--------------------------------------------------------------------------------
 // 6. File that stores settings related to the operation of this player
@@ -126,5 +119,3 @@
 //                                │   ├── @album/
 //                                │   │   ├── ...
 //================================================================================
-
-#endif // _CONFIG_H_

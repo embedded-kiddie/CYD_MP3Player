@@ -1,5 +1,7 @@
 //================================================================================
 // JSON and N-ary Tree conversion
+//  Description:
+//    This class manages the albums to be played using data in JSON format.
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================

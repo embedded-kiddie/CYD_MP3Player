@@ -32,7 +32,7 @@
 //  4. Configuring MP3Player
 //    - Open "./config.h" and define symbols from 1. to 7. as you wish.
 //
-//  ## Harcware Requiremtnt
+//  ## Hardware Requiremtnt
 //  This software is optimized for "ESP32-2432S028R" (aka Cheap Yellow Display).
 //  Connect a speaker, or an external DAC via the connector(s) on this board.
 //  For detail, see the follwing resources:
