@@ -57,7 +57,7 @@ Select [ESP32 Dev Module][2] as a board.
 ### 3.3. Libraries
 | Name                                | Version              |
 | ----------------------------------- | -------------------- |
-| [LVGL][4] by kisvegabor             | 9.2.2 - 9.5.0        |
+| [LVGL][4] by kisvegabor             | 9.2.2 - 9.6.0        |
 | [LovyanGFX][5] by lovyan03          | 1.2.7, 1.2.19 and up |
 | [SdFat][6] by Bill Greiman          | 2.3.0                |
 | [ArduinoJson][7] by Benoit Blanchon | 7.4.2, 7.4.3         |
@@ -148,8 +148,18 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
   ps -axc | grep -i arduino | awk '{print $1}' | xargs -I@ kill -9 @
   ```
 
-- Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and SdFat, the following warning will be out during compilation, but this is not a problem for practical use.
+- **Warnings for functions deprecated in LVGL 9.6.0**
+
+  The following warning is issued during the compilation of `ui_ScreenAlbumList.cpp`. Please ignore this,　as a suitable solution could not be found 🙄
+
+  ```c++
+  warning: 'lv_obj_t* lv_list_add_text(lv_obj_t*, const char*)' is deprecated: lv_list is deprecated; build a list from a flex column instead. See the lv_example_flex_list example. [-Wdeprecated-declarations]
   
+  warning: 'lv_obj_t* lv_list_create(lv_obj_t*)' is deprecated: lv_list is deprecated; build a list from a flex column instead. See the lv_example_flex_list example. [-Wdeprecated-declarations]
+  ```
+
+- Due to the exception handling for the `new` operator differs between the C++ Standard Template Library (STL) and [SdFat][6], the following warning will be out during compilation, but this is not a problem for practical use.
+
   ```c++
   /Users/xxxx/Documents/Arduino/libraries/SdFat/src/FsLib/FsNew.h:44:48: warning: optimization attribute on 'void* operator new(size_t, newalign_t*)' follows definition but the attribute doesn't match [-Wattributes]
   void* operator new(size_t size, newalign_t* ptr);
@@ -161,13 +171,50 @@ Some UI-related parameters (e.g. "**Shuffle**", "**Favorite**", "**Partition**",
 
 - When using the built-in DAC and amplifier, there will be a "click" sound when powering up and when pausing/resume playback.
 
-- The UI screen is designed for a 240x320 resolution only and is not responsive.
+- This UI screen is designed exclusively for a 240x320 resolution and does not feature a responsive design that supports other resolutions.
 
-- It has been observed that `@photo.jpg` does not display depending on the tool that generates/compresses JPEG images. If the album cover photo is not displayed, please recreate it using [GIMP][11] or similar.
+- It has been confirmed that album cover images may not display correctly depending on the tools used to generate or compress the JPEG images. In such cases, please recreate the image using software such as [GIMP][11].
 
-- The elapsed playing time is an estimate by the I2S audio library and may differ from the actual playing time. Please consider it as just a UI effect.
+- The playback duration is an estimate based on the I2S audio library and may differ from the actual playback time; please regard it solely as a UI visual effect.
 
 - "**Bluetooth**" icon at the top left on "**Main**" screen is not supported yet 😅
+
+## 8. Technical Note
+<details>
+<summary>Music File Management</summary>
+
+An N-ary tree structure is used as a data structure for efficiently managing directory hierarchies.
+
+To enable the searching of any directory or file within this tree structure, each node is assigned a unique integer value, starting from `0`.
+
+![N-ary tree structure](assets/TreeStructure.jpg)
+
+Regarding the assignment of these integer values, the method differs between the "Album List" and the "Playlist" as follows.
+
+#### Album List
+In order to traverse the directory hierarchy, depth-first search (DFS) is used to assign integer IDs.
+
+#### Playlist
+First, assign an integer value as an ID to each music file located at the leaf nodes.
+
+Next, for each parent node, assign an ID equal to the maximum ID value among its child nodes.
+
+To locate a specific music file (leaf node) with a given ID starting from the root, traverse the tree by following nodes that satisfy the condition: "music file ID ≤ node ID".
+
+![Tree traversal](assets/TreeTraversal.png)
+
+In practice, to implement a "shuffle" feature, an array is placed between the N-ary tree structure and the Playlist.
+</details>
+
+<details>
+<summary>Playlist Smooth Scrolling</summary>
+
+Playlist is implemented by refining the sample ["Infinite (virtualized) scrolling"](https://lvgl.io/docs/open/examples/scroll#infinite-virtualized-scrolling "Scrolling｜LVGL Open").
+
+In this sample, cells are added and removed during scrolling, making memory fragmentation due to object creation and deallocation unavoidable.
+
+To address this issue, memory fragmentation is avoided by pre-creating a sufficient number of cells with the required styles applied, and rotating their order using [`lv_obj_move_to_index()`](https://lvgl.io/docs/open/api/public/core/lv_obj_tree_h#lv_obj_move_to_index "lv_obj_tree.h｜LVGL Open").
+</details>
 
 ## 7. Credits
 Thanks to the [ESP32 I2S audio library][14] in [hexeguitar/ESP32_TFT_PIO][15] (MIT license). This application includes a customized version of the `CYD_Audio` library.

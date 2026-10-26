@@ -289,7 +289,7 @@ static bool auto_saving(void) {
         autoSaving ^= SAVE_FAVORITE;
       }
       if (screen == ui_ScreenAlbumList) {
-        player.m_tree->traverse_preorder();
+        player.m_tree->traverse_depth();
       }
     }
 

@@ -12,9 +12,9 @@ Originally written for PlatformIO, the version included here has been modified f
 This library strongly recommends using with **ESP32 core version 2.0.17**, since [the I2S driver in 3.x][9] has been [completely redesigned and refactored to use the new ESP-IDF driver][10], which deprecates some functions and causes issues such as clicking noises.
 
 ### [CYD_MP3Player_Basic](CYD_MP3Player_Basic)
-This is a simple sketch that demonstrates how to use the CYD_Audio library. It plays a specified audio file stored on the SD card.
+This is a simple sketch that demonstrates how to use the `CYD_Audio` library. It plays a specified audio file stored on the SD card.
 
-CYD28_audio.[ch] defines helper functions for creating an instance of the CYD_Audio class on Core 1, making it easy to create a GUI loop that runs on Core 0.
+CYD28_audio.[ch] defines helper functions for creating an instance of the `CYD_Audio` class on Core 1, making it easy to create a GUI loop that runs on Core 0.
 
 This example creates a task named `audioplay` on core 0 with a predefined set of commands, and allows core 1 to send messages to it to control playback, volume adjustment, etc.
 
@@ -27,6 +27,9 @@ This sketch is an example of applying the `CYD_Audio` wrapper class named `MP3Pl
 This version features a rich LVGL GUI that allows you to play and manage audio files, add favorites, and shuffle playback.
 
 The `MP3Player` class has been extended to meet the requirements of UI components.
+
+#### Note
+**This program includes an optimized `CYD_Audio` class, so it does not require the installation of the `CYD_Audio` library.**
 
 ## Hardware Specifications
 

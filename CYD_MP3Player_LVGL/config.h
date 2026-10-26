@@ -35,7 +35,7 @@
 // If auto-detection does not work on some variants, set USE_AUTODETECT to false.
 // true  : Use the LGFX auto-detection feature (which increase available memory).
 // false : Define the appropriate CYD variant type in section 2.1.
-#define USE_AUTODETECT    false // "CYD_2432S028R_1USB" or "CYD_2432S028R_2USB" only
+#define USE_AUTODETECT    true // "CYD_2432S028R_1USB" or "CYD_2432S028R_2USB" only
 
 //--------------------------------------------------------------------------------
 // 3. Touch panel calibration

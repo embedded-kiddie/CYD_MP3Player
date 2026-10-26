@@ -171,7 +171,7 @@ extern __attribute__((weak)) size_t count_exposed_nodes(void);
 extern __attribute__((weak)) size_t count_album_list(void);
 extern __attribute__((weak)) void show_album_list(void);
 extern __attribute__((weak)) void dump_album_list(void);
-extern __attribute__((weak)) void dump_preorder(void);
+extern __attribute__((weak)) void dump_depth(void);
 
 ///////////////// SCREEN: ui_ScreenSetting //////////////////
 extern lv_obj_t *ui_ScreenSetting;

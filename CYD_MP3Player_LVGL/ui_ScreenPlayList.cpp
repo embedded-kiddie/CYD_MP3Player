@@ -163,7 +163,11 @@ static lv_obj_t *add_list_cell(lv_obj_t* parent, uint32_t track_id) {
   lv_obj_add_style              (cell, &style_cell_pressed, LV_STATE_PRESSED);
   lv_obj_add_style              (cell, &style_cell_checked, LV_STATE_CHECKED);
   lv_obj_add_event_cb           (cell, event_handler, LV_EVENT_CLICKED, (void*)track_id);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
   lv_obj_remove_flag            (cell, LV_OBJ_FLAG_SCROLLABLE); // Stop sliding horizontally
+#else // 9.6.0
+  lv_obj_set_scrollable         (cell, false);
+#endif
 
   MP3Tags_t tags;
   ui_get_id3tags(track_id, tags);
@@ -462,7 +466,11 @@ bool ui_list_get_heart_state(uint32_t track_id) {
 void ui_ScreenPlayList_screen_init(void) {
   if (ui_ScreenPlayList == NULL) {
     ui_ScreenPlayList = lv_obj_create(NULL);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_remove_flag        (ui_ScreenPlayList, LV_OBJ_FLAG_SCROLLABLE);
+#else // 9.6.0
+    lv_obj_set_scrollable     (ui_ScreenPlayList, false);
+#endif
     lv_obj_set_style_bg_color (ui_ScreenPlayList, UI_COLOR_LIST_PRESSED, 0);
     lv_obj_set_style_bg_opa   (ui_ScreenPlayList, 255,                   0);
   }

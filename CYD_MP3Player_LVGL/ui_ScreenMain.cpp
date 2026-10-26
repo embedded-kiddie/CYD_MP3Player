@@ -207,7 +207,11 @@ void ui_ScreenMain_screen_init(void) {
   ////////////////////// Elapsed Time ///////////////////////
   ui_ElapsedBar = lv_slider_create(ui_ScreenMain);
   lv_slider_set_value       (ui_ElapsedBar, 0, LV_ANIM_OFF);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
   lv_obj_remove_flag        (ui_ElapsedBar, LV_OBJ_FLAG_GESTURE_BUBBLE);
+#else // 9.6.0
+  lv_obj_set_gesture_bubble (ui_ElapsedBar, false);
+#endif
   {
     static constexpr lv_style_const_prop_t style_prop_common[] = {
       LV_STYLE_CONST_HEIGHT(6),
@@ -607,7 +611,11 @@ void ui_ScreenMain_screen_init(void) {
   ui_Volume = lv_slider_create(ui_ScreenMain);
   lv_slider_set_range(ui_Volume, 0, 21); // MP3_VOLUME_MAX (21) is defined in MP3Player.h
   lv_slider_set_value(ui_Volume, 0, LV_ANIM_OFF);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
   lv_obj_remove_flag (ui_Volume, LV_OBJ_FLAG_GESTURE_BUBBLE);
+#else // 9.6.0
+  lv_obj_set_gesture_bubble(ui_Volume, false);
+#endif
   {
     static constexpr lv_style_const_prop_t style_prop_common[] = {
       LV_STYLE_CONST_HEIGHT(8),

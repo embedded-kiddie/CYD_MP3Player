@@ -100,6 +100,32 @@ static void event_handler(lv_event_t *e);
 static void draw_image_cb(lv_event_t *e);
 
 //--------------------------------------------------------------------------------
+// Alternative functions deprecated in LVGL 9.6.0
+// https://lvgl.io/docs/open/changelog/migration-v9-6
+// https://github.com/lvgl/lvgl/blob/release/v9.6/examples/layouts/flex/lv_example_flex_list.c#L67-L88
+//--------------------------------------------------------------------------------
+#define USE_FLEX_LIST false // could not found a solution :(
+
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR == 6) && USE_FLEX_LIST
+// Create a list: a flex container that stacks its children in a column.
+static lv_obj_t * flex_list_create(lv_obj_t * parent) {
+    lv_obj_t * list = lv_obj_create(parent);
+    lv_obj_set_flex_flow(list, LV_FLEX_FLOW_COLUMN);
+//  lv_obj_add_style(list, &style_list, 0);
+    return list;
+}
+
+// Add a full-width text row (a section header) to the list.
+static lv_obj_t * flex_list_add_text(lv_obj_t * list, const char * txt) {
+    lv_obj_t * label = lv_label_create(list);
+    lv_obj_set_width(label, lv_pct(100));
+//  lv_obj_add_style(label, &style_header, 0);
+    lv_label_set_text(label, txt);
+    return label;
+}
+#endif // LVGL_VERSION 9.6.0
+
+//--------------------------------------------------------------------------------
 // Get the node pointer from the cell's userdata
 //--------------------------------------------------------------------------------
 static inline Node *get_node(lv_obj_t *cell) {
@@ -193,8 +219,13 @@ static void setup_cell_styles(lv_obj_t *cell, Node *node) {
   if (lv_obj_get_event_count(cell) == 0) {
     lv_obj_add_style        (cell, &style_cell, (uint32_t)LV_PART_MAIN);
     lv_label_set_long_mode  (cell, LV_LABEL_LONG_CLIP); // LV_LABEL_LONG_DOT, LV_LABEL_LONG_SCROLL_CIRCULAR
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_add_flag         (cell, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag         (cell, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+#else // 9.6.0
+    lv_obj_set_clickable    (cell, true);
+    lv_obj_set_send_draw_task_events(cell, true);
+#endif
     lv_obj_add_event_cb     (cell, draw_image_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_event_cb     (cell, event_handler, LV_EVENT_CLICKED, NULL);
   }
@@ -220,7 +251,11 @@ static inline lv_obj_t *append_cell(lv_obj_t *list, Node *node) {
     printf("count:%3d added   %3d \"%s\"\n", album_control.count, node->key, node->name.c_str());
   });
 
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5) || !USE_FLEX_LIST
   lv_obj_t * cell = lv_list_add_text(list, node->name.c_str());
+#else // 9.6.0
+  lv_obj_t * cell = flex_list_add_text(list, node->name.c_str());
+#endif
   setup_cell_styles(cell, node);
   return cell;
 }
@@ -240,7 +275,7 @@ static inline void delete_cell(lv_obj_t *list, lv_obj_t *cell) {
 //--------------------------------------------------------------------------------
 static Node *find_after(int key) {
   while (++key < album_control.n_nodes) {
-    Node *node = album_control.root->find_preorder(key);
+    Node *node = album_control.root->find_depth(key);
     DBG_ASSERT(node);
     if (node->meta.depth == 1 || node->meta.hidden == false) {
       return node;
@@ -251,7 +286,7 @@ static Node *find_after(int key) {
 
 static Node *find_before(int key) {
   while (--key >= 0) {
-    Node *node = album_control.root->find_preorder(key);
+    Node *node = album_control.root->find_depth(key);
     if (node && (node->meta.depth == 1 || node->meta.hidden == false)) {
       return node;
     }
@@ -306,7 +341,7 @@ static void update_open(lv_obj_t *list, Node *node, uint32_t index, lv_anim_t *a
   uint32_t d = depth + 1;
 
   for (int key = node->key + 1; key < album_control.n_nodes; key++) {
-    node = album_control.root->find_preorder(key);
+    node = album_control.root->find_depth(key);
     if (node->meta.depth <= depth) {
       break;
     }
@@ -345,7 +380,7 @@ static void update_close(lv_obj_t *list, Node *node, uint32_t index, lv_anim_t *
 
   // Hide all the children
   for (int key = node->key + 1; key < album_control.n_nodes; key++) {
-    node = album_control.root->find_preorder(key);
+    node = album_control.root->find_depth(key);
     if (node->meta.depth <= depth) {
       break;
     }
@@ -591,7 +626,7 @@ static void album_list_refresh(int key = 0) {
 static void toggle_cell_state(int type, int state) {
   const int n = album_control.n_nodes;
   for (int i = 0; i < n; i++) {
-    Node *node = album_control.root->find_preorder(i);
+    Node *node = album_control.root->find_depth(i);
     DBG_ASSERT(node);
     if (type == TYPE_NODE) {
       node->meta.hidden = (state == NODE_FOLDED ? NODE_HIDDEN : NODE_REVEALED);
@@ -889,12 +924,20 @@ static void keypad_button_cb(lv_event_t *e) {
   }
 
   else if (code == LV_EVENT_CANCEL) {
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_add_flag(keypad_panel, LV_OBJ_FLAG_HIDDEN);
+#else // 9.6.0
+    lv_obj_set_hidden(keypad_panel, true);
+#endif
     lv_indev_reset(NULL, ta); /* To forget the last clicked object to make it focusable again */
   }
 
   else if (code == LV_EVENT_READY) {
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_add_flag(keypad_panel, LV_OBJ_FLAG_HIDDEN);
+#else // 9.6.0
+    lv_obj_set_hidden(keypad_panel, true);
+#endif
     lv_indev_reset(NULL, ta);
 
     String name = lv_textarea_get_text(ta);
@@ -960,15 +1003,27 @@ static void keypad_event_cb(lv_event_t *e) {
 
   switch (id) {
     case 0: /* LV_SYMBOL_KEYBOARD */
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
       if (lv_obj_has_flag(keypad_panel, LV_OBJ_FLAG_HIDDEN)) {
+#else // 9.6.0
+      if (lv_obj_is_hidden(keypad_panel)) {
+#endif
         if (album_control.list_id == 0) {
           lv_textarea_set_text(ta, ""); // Create a new list
         } else {
           lv_textarea_set_text(ta, album_control.list[album_control.list_id].name.c_str()); // Edit an exsisting list
         }
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
         lv_obj_remove_flag(keypad_panel, LV_OBJ_FLAG_HIDDEN);
+#else // 9.6.0
+        lv_obj_set_hidden(keypad_panel, false);
+#endif
       } else {
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
         lv_obj_add_flag(keypad_panel, LV_OBJ_FLAG_HIDDEN);
+#else // 9.6.0
+        lv_obj_set_hidden(keypad_panel, true);
+#endif
       }
       break;
     case 1: /* LV_SYMBOL_SAVE */
@@ -1105,7 +1160,11 @@ void ui_ScreenAlbumList_screen_init(void) {
   lv_obj_add_style                    (obj, &style_button_item, LV_PART_ITEMS);
   lv_obj_add_event_cb                 (obj, draw_button_cb,  LV_EVENT_DRAW_TASK_ADDED, NULL);
   lv_obj_add_event_cb                 (obj, toggle_event_cb, LV_EVENT_VALUE_CHANGED,   NULL);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
   lv_obj_add_flag                     (obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+#else // 9.6.0
+  lv_obj_set_send_draw_task_events    (obj, true);
+#endif
 
   if (keypad_buttons == NULL) {
     keypad_buttons = lv_buttonmatrix_create(ui_ScreenAlbumList);
@@ -1116,7 +1175,11 @@ void ui_ScreenAlbumList_screen_init(void) {
     lv_obj_add_style                    (keypad_buttons, &style_button_item, LV_PART_ITEMS);
     lv_obj_add_event_cb                 (keypad_buttons, draw_button_cb,  LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_event_cb                 (keypad_buttons, keypad_event_cb, LV_EVENT_VALUE_CHANGED,   NULL);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_add_flag                     (keypad_buttons, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+#else // 9.6.0
+  lv_obj_set_send_draw_task_events      (keypad_buttons, true);
+#endif
   }
 
   //////////////////// List Container ////////////////////
@@ -1130,7 +1193,11 @@ void ui_ScreenAlbumList_screen_init(void) {
     };
     static LV_STYLE_CONST_INIT(style_album, (void*)(style_prop_album));
 
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5) || !USE_FLEX_LIST
     album_list = lv_list_create(ui_ScreenAlbumList);
+#else // 9.6.0
+    album_list = flex_list_create(ui_ScreenAlbumList);
+#endif
     lv_obj_add_style          (album_list, &style_album, 0);
 //  lv_obj_set_scrollbar_mode (album_list, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_event_cb       (album_list, scroll_cb, LV_EVENT_SCROLL, NULL);
@@ -1172,7 +1239,11 @@ void ui_ScreenAlbumList_screen_init(void) {
     keypad_panel = lv_obj_create(ui_ScreenAlbumList);
     lv_obj_add_style          (keypad_panel, &style_paenl, (uint32_t)LV_PART_MAIN);
     lv_obj_set_scrollbar_mode (keypad_panel, LV_SCROLLBAR_MODE_OFF);
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
     lv_obj_add_flag           (keypad_panel, LV_OBJ_FLAG_HIDDEN);
+#else // 9.6.0
+    lv_obj_set_hidden         (keypad_panel, true);
+#endif
 
     // Keypad
     static constexpr lv_style_const_prop_t style_keypad_prop[] = {
@@ -1305,7 +1376,7 @@ void ui_album_create(void *root, bool update) {
   if (root) {
     // Re-traverse node tree by preorder and initialize album list
     album_control.root = reinterpret_cast<Node*>(root);
-    album_control.n_nodes = album_control.root->traverse_preorder();
+    album_control.n_nodes = album_control.root->traverse_depth();
     album_list_refresh(); // Initialize album list widgets
 
     // Load json data and update album list and dropdown
@@ -1327,7 +1398,7 @@ void ui_album_load(void *root) {
   if (root) {
     // Once traverse node tree by preorder and load album list
     album_control.root = reinterpret_cast<Node*>(root);
-    album_control.n_nodes = album_control.root->traverse_preorder();
+    album_control.n_nodes = album_control.root->traverse_depth();
     album_list_load(); // Load album list data
 
     // Then traverse again to scan audio files
@@ -1422,8 +1493,8 @@ size_t count_album_list(void) {
 
 void show_album_list(void) {
 #if   true
-  Node *top = album_control.root->find_preorder(album_control.top);
-  Node *end = album_control.root->find_preorder(album_control.end);
+  Node *top = album_control.root->find_depth(album_control.top);
+  Node *end = album_control.root->find_depth(album_control.end);
   printf("top:%3d (pos: %d) \"%s\", end:%3d (pos: %d) \"%s\", count: %d/%d\n",
     album_control.top, lv_obj_get_scroll_top   (album_list), top->name.c_str(),
     album_control.end, lv_obj_get_scroll_bottom(album_list), end->name.c_str(),
@@ -1441,7 +1512,7 @@ void dump_album_list(void) {
   dump_album(album_list, 0); // dump all cells in album list
 }
 
-void dump_preorder(void) {
-  album_control.root->dump_preorder(true); // dump all nodes in tree by preorder
+void dump_depth(void) {
+  album_control.root->dump_depth(true); // dump all nodes in tree by preorder
 }
 #endif // Debug functions

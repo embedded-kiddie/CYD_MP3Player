@@ -152,7 +152,11 @@ void ui_ScreenSetting_screen_init(void) {
     for (int i = 0; i <= PARTITION_MAX; i++) {
       obj = lv_checkbox_create(container);
       lv_checkbox_set_text_static (obj, "");
+#if (LVGL_VERSION_MAJOR == 9 && LVGL_VERSION_MINOR <= 5)
       lv_obj_add_flag             (obj, LV_OBJ_FLAG_EVENT_BUBBLE); // Propagate the events to the container
+#else // 9.6.0
+      lv_obj_set_event_bubble     (obj, true);
+#endif
       lv_obj_add_style            (obj, &style_radio,       (uint32_t)LV_PART_INDICATOR);
       lv_obj_add_style            (obj, &style_radio_check, (uint32_t)LV_PART_INDICATOR | (uint32_t)LV_STATE_CHECKED);
 

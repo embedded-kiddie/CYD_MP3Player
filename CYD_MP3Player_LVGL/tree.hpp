@@ -4,7 +4,7 @@
 //    This class manages the music files to be played in an N-ary tree structure.
 //  Reference:
 //    https://www.geeksforgeeks.org/dsa/tree-data-structure/
-//    https://www.geeksforgeeks.org/dsa/generic-treesn-array-trees/
+//    https://www.geeksforgeeks.org/dsa/binary-search-tree-data-structure/
 //  Auther: embedded-kiddie (https://github.com/embedded-kiddie)
 //  Released under the GPLv3 (https://www.gnu.org/licenses/gpl-3.0.html)
 //================================================================================
@@ -170,7 +170,7 @@ private:
     });
   }
 
-  // traverse and assign keys similar to post-order
+  // traverse and assign keys similar to Binary Search Tree
   // e.g.      root
   //    ┌───────┼─────────┐
   //    1       3         8
@@ -201,7 +201,7 @@ private:
     return depth;
   }
 
-  // traverse and assign keys by pre-order
+  // traverse and assign keys by Depth First Search
   // e.g.      root
   //    ┌───────┼─────────┐
   //    0       3         6
@@ -209,10 +209,10 @@ private:
   //  1   2   4   5   7       10
   //                ┌─┴─┐  ┌──┼──┐
   //                8   9  11 12 13
-  void traverse_preorder(Node *node, uint16_t depth) {
+  void traverse_depth(Node *node, uint16_t depth) {
     for (auto &n : node->children) {
       n->key = n_nodes++;
-      traverse_preorder(n, depth + 1);
+      traverse_depth(n, depth + 1);
     }
   }
 
@@ -223,9 +223,9 @@ public:
     return n_nodes;
   }
 
-  uint32_t traverse_preorder(void) {
+  uint32_t traverse_depth(void) {
     n_nodes = 0;
-    traverse_preorder(this, 1);
+    traverse_depth(this, 1);
     return n_nodes;
   }
 
@@ -278,7 +278,7 @@ private:
   }
 
   // find the node/leaf with the specified key
-  Node *find_preorder(Node * node, int key) {
+  Node *find_depth(Node * node, int key) {
     const int N = node->children.size();
     for (int i = N - 1; i >= 0; i--) {
       Node *n = node->children[i];
@@ -287,7 +287,7 @@ private:
         return n;             // found node
       }
       else if (n->key < key) {
-        if (n = find_preorder(n, key)) {
+        if (n = find_depth(n, key)) {
           return n;
         }
       }
@@ -316,8 +316,8 @@ public:
   }
 
   // find the node/leaf with the specified key
-  Node *find_preorder(int key) {
-    return find_preorder(this, key);
+  Node *find_depth(int key) {
+    return find_depth(this, key);
   }
 
   void print_node(Node *node) {
@@ -352,12 +352,12 @@ public:
     }
   }
 
-  void dump_preorder(bool all = false) {
-    traverse_preorder();
+  void dump_depth(bool all = false) {
+    traverse_depth();
     //dump_tree();
     //print_node(this);
     for (int i = 0; i < n_nodes; i++) {
-      Node *n = find_preorder(i);
+      Node *n = find_depth(i);
       Node *p = m_found_node; // parent node
       DBG_ASSERT(n);
       if (all || p->meta.checked == NODE_UNFOLDED) {
